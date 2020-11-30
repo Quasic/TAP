@@ -1,0 +1,7 @@
+.gitattributes text eol=lf
+*.sh text eol=lf
+*.pl text eol=lf diff=perl
+*.awk text eol=lf
+*.bat text eol=crlf
+*.vbs text eol=crlf
+*.wsf text eol=crlf
