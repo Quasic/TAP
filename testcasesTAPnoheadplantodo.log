@@ -1,0 +1,7 @@
+1..6 todo 4 5;
+ok 1
+ok 2 # skip
+ok 3 # skip
+not ok 4
+not ok 5
+ok 6

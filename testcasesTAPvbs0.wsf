@@ -1,0 +1,8 @@
+<job id="TAPtestcasesVBS">
+<script language=JScript src="requireCSCRIPT.js"></script>
+<script language=VBScript src="./TAP.vbs"></script>
+<script language=VBScript>
+startTests WScript.stdout,"TAPtestcasesVBSclass0","skip test test"
+endTests
+</script>
+</job>

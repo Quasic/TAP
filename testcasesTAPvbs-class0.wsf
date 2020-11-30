@@ -1,0 +1,9 @@
+<job id="TAPtestcasesVBSclass0">
+<script language=JScript src="requireCSCRIPT.js"></script>
+<script language=VBScript src="./TAPclass.vbs"></script>
+<script language=VBScript>
+set T=new TAP
+T.startTests WScript.stdout,"TAPtestcasesVBSclass0","skip test test"
+T.endTests
+</script>
+</job>

@@ -1,0 +1,8 @@
+#TAP testing log
+1..4
+ok - TAP dummy pass
+ok 2 # skip TAP dummy
+ok 3 # skip TAP dummy
+not ok 4 - TAP dummy todo fail # TODO TAP test
+#   Failed (TODO) test 'TAP dummy todo fail'
+#TAP tests END

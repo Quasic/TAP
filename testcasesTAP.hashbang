@@ -1,0 +1,10 @@
+
+#pre
+#!
+#won't work
+
+#!cat
+#should work
+#TAP testing hashbangs
+1..1
+ok
