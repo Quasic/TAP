@@ -1,0 +1,23 @@
+testanything.org
+
+Version 12:
+
+[version line omitted means 12]
+[1..num [#{TODO|skip*} [reason]]]
+[not] ok [num] [-] [name] [#{TODO|skip*} [reason]]
+[# diagnostic]
+[1..num]
+
+last line format only to check num when num not known at start
+TOdo and skIP are case insensitive
+
+Version 13:
+
+TAP version 13
+[1..num [#{TODO|skip*} [reason]]]
+[not] ok [num] [-] [name] [#{TODO|skip*} [reason]]
+[# diagnostic]
+[	---
+	YAML diagnostic (unstandardized, yet?)
+	...]
+[1..num]
