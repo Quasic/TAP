@@ -1,0 +1,3 @@
+#TAP testing gitscript shell testcases
+1..1
+ok 1 - TAP dummy todo pass # TODO TAP test

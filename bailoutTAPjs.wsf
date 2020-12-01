@@ -1,0 +1,9 @@
+<job id="testcasesTAPjs">
+<script language=JScript src="requireCSCRIPT.js"></script>
+<script language=JScript src="TAP.js"></script>
+<script language=JScript>
+T=startTests(function(s){WScript.stdout.write(s)},"testcasesTAPjs",4);
+T.bailOut("test");
+T.endTests();
+</script>
+</job>

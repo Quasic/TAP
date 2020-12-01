@@ -1,0 +1,3 @@
+#TAP testing bailout.sh
+1..2
+Bail out!  test

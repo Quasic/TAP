@@ -1,0 +1,10 @@
+<job id="testcasesTAPjs">
+<script language=JScript src="requireCSCRIPT.js"></script>
+<script language=JScript src="./TAP.js"></script>
+<script language=JScript>
+T=startTests(function(s){WScript.stdout.write(s)},"testcasesTAPjs",1);
+T.todo("TAP test",1);
+	T.pass("TAP dummy todo pass");
+T.endTests();
+</script>
+</job>
