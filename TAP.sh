@@ -11,13 +11,14 @@ endtests(){
 	if [ "$TESTSFAILED" -ne 0 ]
 	then
 		echo "#Failed $TESTSFAILED tests"
+		[ "$TESTSFAILED" -gt 254 ]&&TESTSFAILED=254
 	fi
 	if [ "$TESTSRUN" -ne "$NUMTESTS" ]
 	then
 		echo "#Planned $NUMTESTS tests, but ran $TESTSRUN tests"
-		((TESTSFAILED++))
+		TESTSFAILED=255
 	fi
-	[ "$TESTSFAILED" -gt 254 ]&&exit 255
+	[[ $- == *i* ]]&&read -rn1 -p "Press a key to close log (will return $TESTSFAILED)">&2
 	exit $TESTSFAILED
 }
 bailout(){
