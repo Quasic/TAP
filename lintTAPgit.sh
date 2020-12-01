@@ -1,4 +1,4 @@
-#!bash
+#!/bin/bash
 #based on default git pre-commit hook
 if git rev-parse --verify HEAD >/dev/null 2>&1
 then
