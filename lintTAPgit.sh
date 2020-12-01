@@ -5,9 +5,13 @@ then
         against=HEAD
 else
         # Initial commit: diff against an empty tree object
-        against=$(git hash-object -w -t tree /dev/null)
+	if ! against=$(git hash-object -w -t tree /dev/null)
+	then
+		source "$(dirname "${BASH_SOURCE[0]}")/TAP.sh" "$(basename "$0")" 'cwd not in a git repo'
+		endtests
+	fi
 fi
-source TAP.sh "$(basename "$0")" 4
+source "$(dirname "${BASH_SOURCE[0]}")/TAP.sh" "$(basename "$0")" 4
 is "$(git diff --name-only --cached --diff-filter=A -z "$against" | LC_ALL=C tr -d '[ -~]\0' | wc -c)" 0 'staged ASCII filenames'
 is "$(git diff --name-only --diff-filter=A -z "$against" | LC_ALL=C tr -d '[ -~]\0' | wc -c)" 0 'ASCII filenames'
 git diff-index --check --cached $against -- >&2
