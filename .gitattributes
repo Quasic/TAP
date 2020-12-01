@@ -7,3 +7,4 @@
 *.bat text eol=crlf
 *.vbs text eol=crlf
 *.wsf text eol=crlf
+*.ps1 text eol=crlf

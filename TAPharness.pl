@@ -8,6 +8,11 @@ exit 1 if ((TAP::Harness->new({
     return undef if$f=~/\.(plx?|pm)$/;
     return['bash',$f]if$f=~/\.(ba?|)sh$/;
     return['gawk','-f',$f]if$f=~/\.awk$/;
+    if($f=~/\.ps1$/){
+      $haspowershell=&which('powershell.exe')if!defined$haspowershell;
+      return[$haspowershell,$f]if$haspowershell;
+      return"#TAP testing $f\n1..0 - #Skipped: no PowerShell\n";
+    }
     if($f=~/\.(bat|cmd|nt)$/){
       $hasdos=&which(qw(cmd.exe command.com))if!defined$hasdos;
       return[$hasdos,'//c',$f]if$hasdos;
