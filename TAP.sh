@@ -72,6 +72,7 @@ todo(){
 	SKIPTYPE='TODO'
 }
 diag(){
+	[ "$1" = '' ]&&return
 	local r
 	while read -r r
 	do
@@ -86,21 +87,12 @@ wasok(){
 	fi
 }
 okrun(){
-	if $1>&2
-	then pass "$2 exec: $1"
-	else fail "$2 exec: $1"
-	fi
-}
-oktest(){
-	if [ $1 ]
-	then pass "$2 [ $1 ]"
-	else fail "$2 [ $1 ]"
-	fi
-}
-ok(){
-	if [[ $1 ]]
-	then pass "$2 [[ $1 ]]"
-	else fail "$2 [[ $1 ]]"
+	local r
+	if r=$(eval $1)
+	then pass "$2"
+	else
+		fail "$2 {$1} code $?"
+		diag "$r"
 	fi
 }
 is(){
@@ -116,13 +108,13 @@ isnt(){
 	fi
 }
 like(){
-	if [[ "$1" =~ "$2" ]]
+	if [[ $1 =~ $2 ]]
 	then pass "$3"
 	else fail "$3, got $1"
 	fi
 }
 unlike(){
-	if [[ "$1" =~ "$2" ]]
+	if [[ $1 =~ $2 ]]
 	then fail "$3, got $1"
 	else pass "$3"
 	fi
