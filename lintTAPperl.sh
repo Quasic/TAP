@@ -27,7 +27,7 @@ if [ "$r" -gt 0 ]
 then
 	printf '#Failed %i tests\n' "$r"
 	if [ "$r" -gt 254 ]
-	then exit 255
+	then exit 254
 	fi
 	exit $r
 fi

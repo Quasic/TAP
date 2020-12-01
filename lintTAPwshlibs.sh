@@ -1,5 +1,5 @@
 #!/bin/bash
-if ! command -v cscript
+if ! command -v cscript >/dev/null
 then
 	echo "#TAP testing WSH library scripts via $0"
 	if [ -f "$1" ]
@@ -38,7 +38,7 @@ if [ "$r" -gt 0 ]
 then
 	printf '#Failed %i tests\n' "$r"
 	if [ "$r" -gt 254 ]
-	then exit 255
+	then exit 254
 	fi
 	exit $r
 fi
