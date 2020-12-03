@@ -109,14 +109,14 @@ isnt(){
 	fi
 }
 like(){
-	if [[ $1 =~ $2 ]]
+	if [[ "$1" =~ $2 ]]
 	then pass "$3"
-	else fail "$3, got $1"
+	else fail "$3, got $1, which didn't match $2"
 	fi
 }
 unlike(){
-	if [[ $1 =~ $2 ]]
-	then fail "$3, got $1"
+	if [[ "$1" =~ $2 ]]
+	then IFS=')(' fail "$3, got $1, which matched $2 for (${BASH_REMATCH[*]})"
 	else pass "$3"
 	fi
 }
