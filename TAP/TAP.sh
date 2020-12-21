@@ -4,10 +4,10 @@
 #released under Creative Commons Attribution (BY) 4.0 license
 #Please report bugs at https://github.com/Quasic/TAP/issues
 
-echo "#TAP testing $1"
+printf '#TAP testing %s\n' "$1"
 case "$2" in
-*[!0-9]*|'') echo "1..0 #Skipped: $2";NUMTESTS=0;;
-*) echo "1..$2";NUMTESTS=$2;;
+*[!0-9]*|'') printf '1..0 #Skipped: %s\n' "$2";NUMTESTS=0;;
+*) printf '1..%i\n' "$2";NUMTESTS=$2;;
 esac
 TESTSERIES=$1
 TESTSRUN=0
@@ -16,19 +16,19 @@ SKIPTESTS=0
 endtests(){
 	if [ "$TESTSFAILED" -ne 0 ]
 	then
-		echo "#Failed $TESTSFAILED tests"
+		printf '#Failed %i tests\n' "$TESTSFAILED"
 		[ "$TESTSFAILED" -gt 254 ]&&TESTSFAILED=254
 	fi
 	if [ "$TESTSRUN" -ne "$NUMTESTS" ]
 	then
-		echo "#Planned $NUMTESTS tests, but ran $TESTSRUN tests"
+		printf '#Planned %i tests, but ran %i tests\n' "$NUMTESTS" "$TESTSRUN"
 		TESTSFAILED=255
 	fi
 	[[ $- == *i* ]]&&read -rn1 -p "Press a key to close log (will return $TESTSFAILED)">&2
 	exit $TESTSFAILED
 }
 bailout(){
-	echo "Bail out!  $1"
+	printf 'Bail out!  %s\n' "$1"
 	exit 255
 }
 pass(){
@@ -36,12 +36,10 @@ pass(){
 	if [ "$SKIPTESTS" -gt 0 ]
 	then
 		((SKIPTESTS--))
-		if [ "$SKIPTYPE" = TODO ]
-		then echo "ok $TESTSRUN - $1 # TODO $SKIPWHY"
-		else echo "ok $TESTSRUN # skip $SKIPWHY"
-		fi
-	else echo "ok - $1"
+		printf 'ok %i - %s # %s\n' "$TESTSRUN" "$1" "$SKIPTYPE $SKIPWHY"
+	else printf 'ok - %s\n' "$1"
 	fi
+	return 0
 }
 fail(){
 	((TESTSRUN++))
@@ -50,13 +48,13 @@ fail(){
 		((SKIPTESTS--))
 		if [ "$SKIPTYPE" = TODO ]
 		then
-			echo "not ok $TESTSRUN - $1 # TODO $SKIPWHY"
-			echo "#   Failed (TODO) test '$1'"
-		else echo "ok $TESTSRUN # skip $SKIPWHY"
+			printf 'not ok %i - %s # TODO %s\n' "$TESTSRUN" "$1" "$SKIPWHY"
+			printf '#   Failed (TODO) test "%s"\n' "$1"
+		else printf 'ok %i # %s\n' "$TESTSRUN" "$SKIPTYPE $SKIPWHY"
 		fi
 	else
 		((TESTSFAILED++))
-		echo "not ok - $1"
+		printf 'not ok - %s\n' "$1"
 	fi
 	return 1
 }
@@ -79,12 +77,23 @@ todo(){
 	SKIPTYPE='TODO'
 }
 diag(){
-	[ "$1" = '' ]&&return
+	if [ "$1" = '' ]
+	then prefixblock '#'
+	else prefixblock '#'<<<"$1"
+	fi
+}
+subtest(){
+	if [ "$1" = '' ]
+	then prefixblock '    '
+	else prefixblock '    '<<<"$1"
+	fi
+}
+prefixblock(){
 	local r
 	while read -r r
 	do
-		echo "#$r"
-	done<<<"$1"
+		printf '%s\n' "$1$r"
+	done
 }
 wasok(){
 	local r=$?
