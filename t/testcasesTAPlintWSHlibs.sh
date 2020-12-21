@@ -1,4 +1,5 @@
 #!/bin/bash
+#test files separately to avoid name conflicts
 if ! command -v cscript >/dev/null
 then
 	echo "#TAP testing WSH library scripts via $0"
@@ -10,14 +11,10 @@ not ok - cscript
 	fi
 	exit
 fi
-if [ -f "$1" ]
-then
-	L=( "$@" )
-	echo "#TAP testing given WSH library scripts via $0"
-else
 	tdir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-	L=( "$tdir/TAP.js" "$tdir/TAP.vbs" "$tdir/TAPclass.vbs" )
-	echo "#TAP testing core WSH library scripts via $0"
+TAPdir="$tdir/../TAP"
+L=( "$TAPdir/TAP.js" "$TAPdir/TAP.vbs" "$TAPdir/TAPclass.vbs" )
+printf '#TAP testing core WSH TAP library scripts via %s\n' "$0"
 fi
 echo "1..${#L[@]}"
 r=0
