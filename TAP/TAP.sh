@@ -1,3 +1,4 @@
+#!/bin/bash
 echo "#TAP testing $1"
 case "$2" in
 *[!0-9]*|'') echo "1..0 #Skipped: $2";NUMTESTS=0;;
@@ -89,7 +90,7 @@ wasok(){
 }
 okrun(){
 	local r
-	if r=$(eval $1)
+	if r=$(eval "$1")
 	then pass "$2"
 	else
 		fail "$2 {$1} code $?"
