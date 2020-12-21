@@ -3,7 +3,7 @@ TESTING='TAP'
 printf '\e]0;%s testcases\e\\%s testcases:\n' "$TESTING" "$TESTING"
 if cd "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 then
-	if perl TAPharness.pl lintTAP*.sh testcasesTAP*.*
+	if perl TAPharness.pl TAP/lintTAP*.sh t/testcasesTAP*.*
 	then printf '\e]0;[Passed] %s testcases\e\\Passed testcases\n' "$TESTING"
 		r=0
 	else printf '\e]0;[Failed] %s testcases\e\\Failed testcases\n' "$TESTING"
