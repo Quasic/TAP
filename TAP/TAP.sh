@@ -1,4 +1,9 @@
 #!/bin/bash
+#TAP format testcase library for bash
+#by Quasic
+#released under Creative Commons Attribution (BY) 4.0 license
+#Please report bugs at https://github.com/Quasic/TAP/issues
+
 echo "#TAP testing $1"
 case "$2" in
 *[!0-9]*|'') echo "1..0 #Skipped: $2";NUMTESTS=0;;
@@ -52,8 +57,8 @@ fail(){
 	else
 		((TESTSFAILED++))
 		echo "not ok - $1"
-		[ "$2" = '' ]||echo "#$TESTSERIES: $2"
 	fi
+	return 1
 }
 skip(){
 	if [ "$SKIPTESTS" -gt 0 ]
@@ -95,6 +100,7 @@ okrun(){
 	else
 		fail "$2 {$1} code $?"
 		diag "$r"
+		return 1
 	fi
 }
 is(){
