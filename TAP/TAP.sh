@@ -9,7 +9,6 @@ case "$2" in
 *[!0-9]*|'') printf '1..0 #Skipped: %s\n' "$2";NUMTESTS=0;;
 *) printf '1..%i\n' "$2";NUMTESTS=$2;;
 esac
-TESTSERIES=$1
 TESTSRUN=0
 TESTSFAILED=0
 SKIPTESTS=0

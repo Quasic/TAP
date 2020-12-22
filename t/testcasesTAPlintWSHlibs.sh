@@ -15,7 +15,6 @@ fi
 TAPdir="$tdir/../TAP"
 L=( "$TAPdir/TAP.js" "$TAPdir/TAP.vbs" "$TAPdir/TAPclass.vbs" )
 printf '#TAP testing core WSH TAP library scripts via %s\n' "$0"
-fi
 echo "1..${#L[@]}"
 r=0
 for f in "${L[@]}"
