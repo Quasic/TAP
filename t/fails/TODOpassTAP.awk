@@ -1,5 +1,5 @@
 #!/bin/gawk -f
-@include "./TAP.awk"
+@include "./TAP/TAP.awk"
 BEGIN{
 startTests("gitscripts textconv awk failcases",1)
 todo("TAP TODO test",1)

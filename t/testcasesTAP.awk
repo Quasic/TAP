@@ -1,5 +1,5 @@
 #!/bin/gawk -f
-@include "./TAP.awk"
+@include "./TAP/TAP.awk"
 BEGIN{
 startTests("gitscripts textconv awk testcases",4)
 pass("TAP dummy pass")

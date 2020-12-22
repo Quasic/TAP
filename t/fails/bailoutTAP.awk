@@ -1,5 +1,5 @@
 #!/bin/gawk -f
-@include "./TAP.awk"
+@include "./TAP/TAP.awk"
 BEGIN{
 startTests("bailoutTAP.awk",2)
 bailout("test")

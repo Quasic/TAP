@@ -1,9 +1,8 @@
 #!/bin/bash
-cd "$(dirname "${BASH_SOURCE[0]}")"||exit 255
-B=(bailoutTAP*.*)
-T=(TODOpassTAP*.*)
+B=(t/fails/bailoutTAP*.*)
+T=(t/fails/TODOpassTAP*.*)
 N=(/dev/null -)
-source TAP.sh 'gitscript all fail testcases' "$(( ${#B[@]}+${#T[@]}+${#N[@]} ))"
+source TAP/TAP.sh 'gitscript all fail testcases' "$(( ${#B[@]}+${#T[@]}+${#N[@]} ))"
 for f in "${N[@]}"
 do
 	perl TAPharness.pl "$f" >/dev/null 2>/dev/null <<<''

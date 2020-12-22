@@ -1,4 +1,4 @@
 #!/bin/bash
-source ./TAP.sh 'bailout.sh' 2
+source TAP/TAP.sh 'bailout.sh' 2
 bailout test
 endtests

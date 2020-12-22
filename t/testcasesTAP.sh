@@ -1,5 +1,5 @@
 #!/bin/bash
-source ./TAP.sh 'gitscript shell testcases' 16
+source TAP/TAP.sh 'gitscript shell testcases' 16
 pass 'TAP dummy pass'
 skip 'TAP dummy' 2
 	pass 'TAP dummy pass'
