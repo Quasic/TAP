@@ -111,6 +111,19 @@ okrun(){
 		return 1
 	fi
 }
+okname(){
+	local r
+	local n
+	n=$1
+	shift
+	if r=$(eval "$@")
+	then pass "$n"
+	else
+		fail "$n {$*} code $?"
+		diag "$r"
+		return 1
+	fi
+}
 is(){
 	if [ "$1" = "$2" ]
 	then pass "$3"
