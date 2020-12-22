@@ -1,4 +1,26 @@
 #!/bin/perl
+=head1 VERSION
+
+Version Alpha
+
+=head1 Experiment
+
+This was an experiment in an alternative simple way to handle file types, rather than using SourceHandlers, (I eventually figured out I could use my own SourceHandlers,) but I couldn't figure out a bug in the testcases. It worked for most practical testcases, though.
+
+=head1 BUGS
+
+Unsolved bugs:
+
+t/fails/bailoutTAP.tap was failing with code 25 instead of 255, only when run from t/testcasesTAPzfails.sh.
+
+Even though this is experimental, you may report more bugs to https://github.com/Quasic/TAP/issues
+
+=head1 LICENSE
+
+Released under Creative Commons Attribution (BY) 4.0 license
+
+=cut
+
 use TAP::Harness;
 exit 1 if ((TAP::Harness->new({
   color=>1,
