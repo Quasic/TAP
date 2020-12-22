@@ -1,11 +1,11 @@
 #!/bin/bash
-shopt -s nullglob
 if [ -f "$1" ]
 then
 	L=( "$@" )
 	echo "#TAP testing awk scripts via $0"
 else
-	L=( ./*.awk )
+	shopt -s nullglob globstar
+	L=( ./**/*.awk )
 	echo "#TAP testing $(realpath .)/*.awk via $0"
 fi
 echo "1..${#L[@]}"

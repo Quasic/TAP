@@ -1,18 +1,18 @@
 #!/bin/bash
-shopt -s nullglob
 if [ -f "$1" ]
 then
 	L=( "$@" )
 	echo "#TAP testing perl scripts via $0"
 else
-	L=( ./*.pl )
+	shopt -s nullglob globstar
+	L=( ./**/*.pl ./**/*.plx ./**/*.pm )
 	echo "#TAP testing $(realpath .)/*.pl via $0"
 fi
 echo "1..${#L[@]}"
 r=0
 for f in "${L[@]}"
 do
-	if q=$(perl -wct $f 2>&1)
+	if q=$(perl -wct "$f" 2>&1)
 	then echo "ok - $f"
 	else
 		echo "not ok - $f"
