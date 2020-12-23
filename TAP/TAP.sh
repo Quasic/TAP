@@ -79,15 +79,17 @@ todo(){
 	SKIPTYPE='TODO'
 }
 diag(){
-	if [ "$1" = '' ]
+	if [ $# -eq 0 ]
 	then prefixblock '#'
-	else prefixblock '#'<<<"$1"
+	elif [ "$1" != '' ]
+	then prefixblock '#'<<<"$1"
 	fi
 }
 subtest(){
-	if [ "$1" = '' ]
+	if [ $# -eq 0 ]
 	then prefixblock '    '
-	else prefixblock '    '<<<"$1"
+	elif [ "$1" != '' ]
+	then prefixblock '    '<<<"$1"
 	fi
 }
 prefixblock(){
