@@ -1,4 +1,5 @@
 testanything.org
+node-tap.org
 
 Version 12:
 
@@ -21,3 +22,28 @@ TAP version 13
 	YAML diagnostic (unstandardized, yet?)
 	...]
 [1..num]
+
+
+subtest:
+
+unbuffered:
+
+[#subtest [name]]
+	[1..num ...]
+	[not] ok ...
+	[# diagnostic]
+	[1..num]
+[not] ok [num] [-] [name] [#{TODO|skip*} [reason]]
+
+or buffered:
+
+[not] ok [num] [-] [name] [#{TODO|skip*} [reason]]
+[#diagnostic]
+{
+	[1..num ...]
+	[not] ok ...
+	[# diagnostic]
+	[1..num]
+}
+
+If there is no diagnostic, the opening curly brace can be on the end of the test line
