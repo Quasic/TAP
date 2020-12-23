@@ -19,24 +19,32 @@ else t='lint.sh [list of files]'
 fi
 #shellcheck source=TAP/TAP.sh
 source "$(dirname "${BASH_SOURCE[0]}")/TAP.sh" "$t" $(( $# * 3 ))
-while [ $# -gt 0 ]
+for f in "$@"
 do
-	okname "$1 existance" [ -f "$1" ]
-	okname "$1 read" read -r shebang < "$1"
-	if [[ "$1" =~ \.(ba?|)sh$ ]]||[[ "$shebang" =~ ^\#!(.*/)?bash( |$) ]]
+	if [ -d "$f" ]
+	then
+		pass "$f is directory"
+		skip 'dirtest goes here' 2
+		pass 'dirtest goes here'
+		pass 'dirtest here 2'
+		continue
+	fi
+	okname "$f is file" [ -f "$f" ]
+	okname "$f read" read -r shebang < "$f"
+	if [[ "$f" =~ \.(ba?|)sh$ ]]||[[ "$shebang" =~ ^\#!(.*/)?bash( |$) ]]
 	then
 		if ! [ "$hasShellcheck" = "$usebash" ]
-		then okname "$1 shellcheck" shellcheck -x "$1"
-		else okname "$1 lint bash" bash -n "$1"
+		then okname "$f shellcheck" shellcheck -x "$f"
+		else okname "$f lint bash" bash -n "$f"
 		fi
-	elif ! [ "$hasShellcheck" = '' ]&&[[ "$1" =~ \.zsh$ ]]
-	then okname "$1 shellcheck" shellcheck -x "$1"
+	elif ! [ "$hasShellcheck" = '' ]&&[[ "$f" =~ \.zsh$ ]]
+	then okname "$f shellcheck" shellcheck -x "$f"
 	elif ! [ "$hasShellcheck" = '' ]&&[[ "$shebang" =~ ^\#!(.*/)?zsh( |$) ]]
-	then okname "$1 shellcheck" shellcheck -x "$1"
-	elif [[ "$1" =~ \.p(lx?|m)$ ]]||[[ "$shebang" =~ ^\#!(.*/)?perl( |$) ]]
-	then okname "$1 lint Perl" perl -wct "$1"
-	elif [[ "$1" =~ \.g?awk$ ]]||[[ "$shebang" =~ ^\#!(.*[/g])?awk\ .*-f$ ]]
-	then gawk --lint -e 'BEGIN{exit 0}END{exit 0}' -f "$1" 2>&1| gawk -v file="$1" -e '
+	then okname "$f shellcheck" shellcheck -x "$f"
+	elif [[ "$f" =~ \.p(lx?|m)$ ]]||[[ "$shebang" =~ ^\#!(.*/)?perl( |$) ]]
+	then okname "$f lint Perl" perl -wct "$f"
+	elif [[ "$f" =~ \.g?awk$ ]]||[[ "$shebang" =~ ^\#!(.*[/g])?awk\ .*-f$ ]]
+	then gawk --lint -e 'BEGIN{exit 0}END{exit 0}' -f "$f" 2>&1| gawk -v file="$f" -e '
 		/ (is|are) a gawk extension$/{next}
 		/^gawk: ( *|In file included) from /{P=P"\n#"$0;next}
 		/ warning: (already included source file |POSIX does not allow `\\x'\'' escapes$)/{
@@ -72,17 +80,16 @@ do
 			if(W)print"#Warnings/Info:"W
 		}
 	'
-	# elif [ "$1" = '.sed' ]||[[ "$shebang" =~ ^\#!(.*/)?sed( .*)? (-f|--file=)$ ]]
+	# elif [ "$f" = '.sed' ]||[[ "$shebang" =~ ^\#!(.*/)?sed( .*)? (-f|--file=)$ ]]
 	# then
 		
 	# elif command -v node>/dev/null&&([[ "$shebang" =~ or (no cscript and .js))
 	# cscript shebang wrappers?
-	elif ! [ "$hasCScript" = '' ]&&[[ "$1" =~ \.(js|vbs|wsf)$ ]]
-	then okname "$1 lint cscript" cscript //Nologo //Job:cscriptlint cscriptlint.wsf "$1"
+	elif ! [ "$hasCScript" = '' ]&&[[ "$f" =~ \.(js|vbs|wsf)$ ]]
+	then okname "$f lint cscript" cscript //Nologo //Job:cscriptlint cscriptlint.wsf "$f"
 	else
 		skip "Unknown lint type, shebang: $shebang" 1
-		fail "$1: I don't yet lint this type of file"
+		fail "$f: I don't yet lint this type of file"
 	fi
-	shift
 done
 endtests
