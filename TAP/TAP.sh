@@ -6,6 +6,7 @@
 
 printf '#TAP testing %s\n' "$1"
 case "$2" in
+'?') NUMTESTS='?';;
 *[!0-9]*|'') printf '1..0 #Skipped: %s\n' "$2";NUMTESTS=0;;
 *) printf '1..%i\n' "$2";NUMTESTS=$2;;
 esac
@@ -18,7 +19,9 @@ endtests(){
 		printf '#Failed %i tests\n' "$TESTSFAILED"
 		[ "$TESTSFAILED" -gt 254 ]&&TESTSFAILED=254
 	fi
-	if [ "$TESTSRUN" -ne "$NUMTESTS" ]
+	if [ "$NUMTESTS" = '?' ]
+	then printf '1..%i\n' "$TESTSRUN"
+	elif [ "$TESTSRUN" -ne "$NUMTESTS" ]
 	then
 		printf '#Planned %i tests, but ran %i tests\n' "$NUMTESTS" "$TESTSRUN"
 		TESTSFAILED=255
