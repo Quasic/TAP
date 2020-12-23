@@ -82,9 +82,11 @@ do
 	'
 	# elif [ "$f" = '.sed' ]||[[ "$shebang" =~ ^\#!(.*/)?sed( .*)? (-f|--file=)$ ]]
 	# then
-		
-	# elif command -v node>/dev/null&&([[ "$shebang" =~ or (no cscript and .js))
-	# cscript shebang wrappers?
+	elif [ "$hasNode" != '' ]&&[[ "$shebang" =~ ^#!(.*/)?node( |$) ]]
+	then okname "$f lint node.js" node -c "$f"
+	#elif	([[ "$shebang" =~ cscript shebang wrappers?
+	elif [ "$hasNode" != '' ]&&[[ "$f" =~ \.js$ ]]
+	then okname "$f lint node.js" node -c "$f"
 	elif ! [ "$hasCScript" = '' ]&&[[ "$f" =~ \.(js|vbs|wsf)$ ]]
 	then okname "$f lint cscript" cscript //Nologo //Job:cscriptlint cscriptlint.wsf "$f"
 	else
