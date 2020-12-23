@@ -1,16 +1,16 @@
 #!/bin/bash
 if [ $# -eq 0 ]||[ "$1" = '--help' ]||[ "$1" = '-h' ]
 then
-	printf 'Usage: %s [options] [list of files to lint]\nOptions:\n-n use bash -n instead of shellcheck\n-h or --help for this display\n' "$0"
+	printf 'Usage: %s [options] [list of files to lint]\nOptions:\n-p do NOT check portability\n-h or --help for this display\n' "$0"
 	[[ $- == *i* ]]&&read -rn1 -p "Press a key to close help">&2
 	exit
 fi
 hasCScript=$(command -v cscript.exe)
 hasNode=$(command -v node)
 hasShellcheck=$(command -v shellcheck)
-if [ "$1" = '-n' ]
+if [ "$1" = '-p' ]
 then
-	usebash="$hasShellcheck"
+	portability='n'
 	shift
 fi
 if [ $# -eq 1 ]
@@ -18,28 +18,34 @@ then t="lint.sh $1"
 else t='lint.sh [list of files]'
 fi
 #shellcheck source=TAP/TAP.sh
-source "$(dirname "${BASH_SOURCE[0]}")/TAP.sh" "$t" $(( $# * 3 ))
+source "$(dirname "${BASH_SOURCE[0]}")/TAP.sh" "$t" '?'
 for f in "$@"
 do
+	F="$f"
+	isnt "$f" '' "Empty path test <$f>"
+	unlike "$f" ^- "POSIX (non-switch) $f"||f="./$f"
+	b=$(basename "$f")
+	if [ "$portability" != 'n' ]
+	then
+		[ "$F" != "$b" ]&&unlike "$b" ^- "POSIX (non-switch) $b"
+		is "$(printf "%s" "$b" | LC_ALL=C tr -d '[ -~]\0' | wc -c)" 0 "portable (ASCII-only) $b" #from git's default pre-commit hook
+	fi
 	if [ -d "$f" ]
 	then
 		pass "$f is directory"
-		skip 'dirtest goes here' 2
-		pass 'dirtest goes here'
-		pass 'dirtest here 2'
+		okname "$f read" ls "$f/"
 		continue
 	fi
 	okname "$f is file" [ -f "$f" ]
-	okname "$f read" read -r shebang < "$f"
+	okname "$f not empty" [ -s "$f" ]||continue
+	read -r shebang<"$f";wasok "$f read"
 	if [[ "$f" =~ \.(ba?|)sh$ ]]||[[ "$shebang" =~ ^\#!(.*/)?bash( |$) ]]
 	then
-		if ! [ "$hasShellcheck" = "$usebash" ]
-		then okname "$f shellcheck" shellcheck -x "$f"
-		else okname "$f lint bash" bash -n "$f"
-		fi
-	elif ! [ "$hasShellcheck" = '' ]&&[[ "$f" =~ \.zsh$ ]]
+		okname "$f lint bash" bash -n "$f"
+		[ "$hasShellcheck" != '' ]&&okname "$f shellcheck" shellcheck -x "$f"
+	elif [ "$hasShellcheck" != '' ]&&[[ "$f" =~ \.zsh$ ]]
 	then okname "$f shellcheck" shellcheck -x "$f"
-	elif ! [ "$hasShellcheck" = '' ]&&[[ "$shebang" =~ ^\#!(.*/)?zsh( |$) ]]
+	elif [ "$hasShellcheck" != '' ]&&[[ "$shebang" =~ ^\#!(.*/)?zsh( |$) ]]
 	then okname "$f shellcheck" shellcheck -x "$f"
 	elif [[ "$f" =~ \.p(lx?|m)$ ]]||[[ "$shebang" =~ ^\#!(.*/)?perl( |$) ]]
 	then okname "$f lint Perl" perl -wct "$f"
@@ -85,7 +91,7 @@ do
 		
 	# elif command -v node>/dev/null&&([[ "$shebang" =~ or (no cscript and .js))
 	# cscript shebang wrappers?
-	elif ! [ "$hasCScript" = '' ]&&[[ "$f" =~ \.(js|vbs|wsf)$ ]]
+	elif [ "$hasCScript" != '' ]&&[[ "$f" =~ \.(js|vbs|wsf)$ ]]
 	then okname "$f lint cscript" cscript //Nologo //Job:cscriptlint cscriptlint.wsf "$f"
 	else
 		skip "Unknown lint type, shebang: $shebang" 1
