@@ -17,8 +17,9 @@ if [ $# -eq 1 ]
 then t="lint.sh $1"
 else t='lint.sh [list of files]'
 fi
+dir=$(dirname "${BASH_SOURCE[0]}")
 #shellcheck source=TAP/TAP.sh
-source "$(dirname "${BASH_SOURCE[0]}")/TAP.sh" "$t" '?'
+source "$dir/TAP.sh" "$t" '?'
 for f in "$@"
 do
 	F="$f"
@@ -50,41 +51,7 @@ do
 	elif [[ "$f" =~ \.p(lx?|m)$ ]]||[[ "$shebang" =~ ^\#!(.*/)?perl( |$) ]]
 	then okname "$f lint Perl" perl -wct "$f"
 	elif [[ "$f" =~ \.g?awk$ ]]||[[ "$shebang" =~ ^\#!(.*[/g])?awk\ .*-f$ ]]
-	then gawk --lint -e 'BEGIN{exit 0}END{exit 0}' -f "$f" 2>&1| gawk -v file="$f" -e '
-		/ (is|are) a gawk extension$/{next}
-		/^gawk: ( *|In file included) from /{P=P"\n#"$0;next}
-		/ warning: (already included source file |POSIX does not allow `\\x'\'' escapes$)/{
-			W=W"\n#"$0
-			P=""
-			next
-		}
-		match($0,/^gawk: warning: function( .*) defined but never called directly$/,M){
-			if(M[1]!~/hook/){
-				LIB=LIB M[1]
-				next
-			}
-		}
-		match($0,/^gawk: warning: function( .*) called but never defined$/,M){
-			if(M[1]~/hook/){
-				HOOKS=HOOKS M[1]
-				next
-			}
-		}
-		{
-			X=X P"\n#"$0
-			P=""
-		}
-		END{
-			if(LIB)W=W"\n#Unused Library functions:"LIB
-			if(HOOKS)W=W"\n#Unused hooks:"HOOKS
-			if(X){
-				print"not ok - "file"\n#Errors:"X
-				if(W)print"#Warnings/Info:"W
-				exit 1
-			}
-			print"ok - "file
-			if(W)print"#Warnings/Info:"W
-		}'||((TESTSFAILED++))
+	then gawk --lint -e 'BEGIN{exit 0}END{exit 0}' -f "$f" 2>&1|gawk -v file="$f" -v shebang="$shebang" -f "$dir/lintparse.awk"||((TESTSFAILED++))
 		((TESTSRUN++))
 	# elif [ "$f" = '.sed' ]||[[ "$shebang" =~ ^\#!(.*/)?sed( .*)? (-f|--file=)$ ]]
 	# then
