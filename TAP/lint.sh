@@ -50,7 +50,7 @@ do
 	then okname "$f shellcheck" shellcheck -x "$f"
 	elif [[ "$f" =~ \.p(lx?|m)$ ]]||[[ "$shebang" =~ ^\#!(.*/)?perl( |$) ]]
 	then okname "$f lint Perl" perl -wct "$f"
-	elif [[ "$f" =~ \.g?awk$ ]]||[[ "$shebang" =~ ^\#!(.*[/g])?awk\ .*-f$ ]]
+	elif [[ "$f" =~ \.g?awk$ ]]||[[ "$shebang" =~ ^\#!(.*/|)g?awk\ .*-f$ ]]
 	then gawk --lint -e 'BEGIN{exit 0}END{exit 0}' -f "$f" 2>&1|gawk -v file="$f" -v shebang="$shebang" -f "$dir/lintparse.awk"||((TESTSFAILED++))
 		((TESTSRUN++))
 	# elif [ "$f" = '.sed' ]||[[ "$shebang" =~ ^\#!(.*/)?sed( .*)? (-f|--file=)$ ]]
