@@ -11,7 +11,7 @@ This was an experiment in an alternative simple way to handle file types, rather
 
 Unsolved bugs:
 
-t/fails/bailoutTAP.tap was failing with code 25 instead of 255, only when run from t/testcasesTAPzfails.sh.
+t/fails/bailoutTAP.tap was failing with code 25 instead of 255, only when run from t/testcasesTAPharness-fails.sh.
 
 Even though this is experimental, you may report more bugs to https://github.com/Quasic/TAP/issues
 

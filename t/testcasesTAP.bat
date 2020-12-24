@@ -1,5 +1,5 @@
 @echo off
-cd %~dp0
+cd %~dp0/../TAP
 call startTests "%~nx0" 10
 call pass "TAP dummy pass"
 call skip "TAP dummy" 2

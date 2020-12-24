@@ -1,6 +1,6 @@
 <job id="testcasesTAPjs0">
-<script language=JScript src="requireCSCRIPT.js"></script>
-<script language=JScript src="./TAP.js"></script>
+<script language=JScript src="lib/requireCSCRIPT.js"></script>
+<script language=JScript src="../TAP/TAP.js"></script>
 <script language=JScript>
 T=startTests(function(s){WScript.stdout.write(s)},"testcasesTAPjs0","skip test test");
 T.endTests();
