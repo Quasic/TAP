@@ -37,7 +37,7 @@ do
 		continue
 	fi
 	okname "$f is file" [ -f "$f" ]
-	okname "$f not empty" [ -s "$f" ]||continue
+	okname "$f has contents" [ -s "$f" ]||continue
 	read -r shebang<"$f";wasok "$f read"
 	if [[ "$f" =~ \.(ba?|)sh$ ]]||[[ "$shebang" =~ ^\#!(.*/)?bash( |$) ]]
 	then
@@ -84,20 +84,21 @@ do
 			}
 			print"ok - "file
 			if(W)print"#Warnings/Info:"W
-		}
-	'
+		}'||((TESTSFAILED++))
+		((TESTSRUN++))
 	# elif [ "$f" = '.sed' ]||[[ "$shebang" =~ ^\#!(.*/)?sed( .*)? (-f|--file=)$ ]]
 	# then
 	elif [ "$hasNode" != '' ]&&[[ "$shebang" =~ ^#!(.*/)?node( |$) ]]
 	then okname "$f lint node.js" node -c "$f"
-	#elif	([[ "$shebang" =~ cscript shebang wrappers?
+	elif [ "$hasCScript" != '' ]&&[[ "$shebang" =~ ^(\'|//|/*|[Rr][Ee][Mm] |<!--)\#!(.*/|)cscript\.exe( |$) ]]
+	then okname "$f lint cscript" cscript //Nologo //Job:lint lint.wsf "$f"
 	elif [ "$hasNode" != '' ]&&[[ "$f" =~ \.js$ ]]
 	then okname "$f lint node.js" node -c "$f"
 	elif [ "$hasCScript" != '' ]&&[[ "$f" =~ \.(js|vbs|wsf)$ ]]
-	then okname "$f lint cscript" cscript //Nologo //Job:cscriptlint cscriptlint.wsf "$f"
+	then okname "$f lint cscript" cscript //Nologo //Job:lint lint.wsf "$f"
 	else
-		skip "Unknown lint type, shebang: $shebang" 1
-		fail "$f: I don't yet lint this type of file"
+		skip "Unknown lint type <$f> shebang: $shebang" 1
+		fail 'no lint'
 	fi
 done
 endtests
