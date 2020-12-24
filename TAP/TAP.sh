@@ -48,11 +48,11 @@ fail(){
 	if [ "$SKIPTESTS" -gt 0 ]
 	then
 		((SKIPTESTS--))
-		if [ "$SKIPTYPE" = TODO ]
-		then
-			printf 'not ok %i - %s # TODO %s\n' "$TESTSRUN" "$1" "$SKIPWHY"
-			printf '#   Failed (TODO) test "%s"\n' "$1"
-		else printf 'ok %i # %s\n' "$TESTSRUN" "$SKIPTYPE $SKIPWHY"
+		if [ "$SKIPTYPE" = skip ]
+		then printf 'ok %i - %s # skip %s\n' "$TESTSRUN" "$1" "$SKIPWHY"
+		else
+			printf 'not ok %i - %s # %s\n' "$TESTSRUN" "$1" "$SKIPTYPE $SKIPWHY"
+			[ "$SKIPTYPE" = TODO ]&&printf '#   Failed (TODO) test "%s"\n' "$1"
 		fi
 	else
 		((TESTSFAILED++))
@@ -107,6 +107,7 @@ wasok(){
 	fi
 }
 okrun(){
+	[ "$SKIPTYPE" = skip ]&&pass "$2"&&return
 	local r
 	if r=$(eval "$1")
 	then pass "$2"
@@ -117,6 +118,7 @@ okrun(){
 	fi
 }
 okname(){
+	[ "$SKIPTYPE" = skip ]&&pass "$1"&&return
 	local r
 	local n
 	n=$1
