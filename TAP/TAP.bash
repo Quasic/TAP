@@ -4,79 +4,79 @@
 #released under Creative Commons Attribution (BY) 4.0 license
 #Please report bugs at https://github.com/Quasic/TAP/issues
 
-printf '#TAP testing %s\n' "$1"
+printf '#TAP testing %s (TAP.bash version 0.8 alpha)\n' "$1"
 case "$2" in
-'?') NUMTESTS='?';;
-*[!0-9]*|'') printf '1..0 #Skipped: %s\n' "$2";NUMTESTS=0;;
-*) printf '1..%i\n' "$2";NUMTESTS=$2;;
+'?') TAP_NumTests='?';;
+*[!0-9]*|'') printf '1..0 #Skipped: %s\n' "$2";TAP_NumTests=0;;
+*) printf '1..%i\n' "$2";TAP_NumTests=$2;;
 esac
-TESTSRUN=0
-TESTSFAILED=0
-SKIPTESTS=0
+TAP_TestsRun=0
+TAP_TestsFailed=0
+TAP_SkipTests=0
 endtests(){
-	if [ "$TESTSFAILED" -ne 0 ]
+	if [ "$TAP_TestsFailed" -ne 0 ]
 	then
-		printf '#Failed %i tests\n' "$TESTSFAILED"
-		[ "$TESTSFAILED" -gt 254 ]&&TESTSFAILED=254
+		printf '#Failed %i tests\n' "$TAP_TestsFailed"
+		[ "$TAP_TestsFailed" -gt 254 ]&&TAP_TestsFailed=254
 	fi
-	if [ "$NUMTESTS" = '?' ]
-	then printf '1..%i\n' "$TESTSRUN"
-	elif [ "$TESTSRUN" -ne "$NUMTESTS" ]
+	if [ "$TAP_NumTests" = '?' ]
+	then printf '1..%i\n' "$TAP_TestsRun"
+	elif [ "$TAP_TestsRun" -ne "$TAP_NumTests" ]
 	then
-		printf '#Planned %i tests, but ran %i tests\n' "$NUMTESTS" "$TESTSRUN"
-		TESTSFAILED=255
+		printf '#Planned %i tests, but ran %i tests\n' "$TAP_NumTests" "$TAP_TestsRun"
+		TAP_TestsFailed=255
 	fi
-	[[ $- == *i* ]]&&read -rn1 -p "Press a key to close log (will return $TESTSFAILED)">&2
-	exit $TESTSFAILED
+	[[ $- == *i* ]]&&read -rn1 -p "Press a key to close log (will return $TAP_TestsFailed)">&2
+	exit $TAP_TestsFailed
 }
 bailout(){
-	printf 'Bail out!  %s\n' "$1"
+	printf '\nBail out!  %s\n' "$1"
 	exit 255
 }
 pass(){
-	((TESTSRUN++))
-	if [ "$SKIPTESTS" -gt 0 ]
+	((TAP_TestsRun++))
+	if [ "$TAP_SkipTests" -gt 0 ]
 	then
-		((SKIPTESTS--))
-		printf 'ok %i - %s # %s\n' "$TESTSRUN" "$1" "$SKIPTYPE $SKIPWHY"
+		((TAP_SkipTests--))
+		printf 'ok %i - %s # %s\n' "$TAP_TestsRun" "$1" "$TAP_SkipType $TAP_SkipReason"
 	else printf 'ok - %s\n' "$1"
 	fi
 	return 0
 }
 fail(){
-	((TESTSRUN++))
-	if [ "$SKIPTESTS" -gt 0 ]
+	((TAP_TestsRun++))
+	if [ "$TAP_SkipTests" -gt 0 ]
 	then
-		((SKIPTESTS--))
-		if [ "$SKIPTYPE" = skip ]
-		then printf 'ok %i - %s # skip %s\n' "$TESTSRUN" "$1" "$SKIPWHY"
+		((TAP_SkipTests--))
+		if [ "$TAP_SkipType" = skip ]
+		then printf 'ok %i - %s # skip %s\n' "$TAP_TestsRun" "$1" "$TAP_SkipReason"
 		else
-			printf 'not ok %i - %s # %s\n' "$TESTSRUN" "$1" "$SKIPTYPE $SKIPWHY"
-			[ "$SKIPTYPE" = TODO ]&&printf '#   Failed (TODO) test "%s"\n' "$1"
+			printf 'not ok %i - %s # %s\n' "$TAP_TestsRun" "$1" "$TAP_SkipType $TAP_SkipReason"
+			[ "$TAP_SkipType" = TODO ]&&printf '#   Failed (TODO) test "%s"\n' "$1"
 		fi
 	else
-		((TESTSFAILED++))
+		((TAP_TestsFailed++))
 		printf 'not ok - %s\n' "$1"
 	fi
 	return 1
 }
 skip(){
-	if [ "$SKIPTESTS" -gt 0 ]
+	if [ "$TAP_SkipTests" -gt 0 ]
 	then
-		diag "skip called during $SKIPTYPE, nesting unsupported"
+		diag "skip called during $TAP_SkipType, nesting unsupported"
 	fi
-	SKIPWHY=$1
-	SKIPTESTS=$2
-	SKIPTYPE='skip'
+	TAP_SkipReason=$1
+	TAP_SkipTests=$2
+	TAP_SkipType='skip'
 }
 todo(){
-	if [ "$SKIPTESTS" -gt 0 ]
+	if [ "$TAP_SkipTests" -gt 0 ]
 	then
-		diag "todo called during $SKIPTYPE, nesting unsupported"
+		diag "todo called during $TAP_SkipType, nesting unsupported"
 	fi
-	SKIPWHY=$1
-	SKIPTESTS=$2
-	SKIPTYPE='TODO'
+	TAP_SkipReason=$1
+	TAP_SkipTests=$2
+	TAP_SkipType='TODO'
 }
 diag(){
 	if [ $# -eq 0 ]
@@ -107,23 +107,23 @@ wasok(){
 	fi
 }
 okrun(){
-	[ "$SKIPTYPE" = skip ]&&pass "$2"&&return
+	[ "$TAP_SkipType" = skip ]&&pass "$2"&&return
 	local r
 	if r=$(eval "$1")
 	then pass "$2"
 	else
-		fail "$2 {$1} code $?"
+		fail "$2 ($1) code $?"
 		diag "$r"
 		return 1
 	fi
 }
 okname(){
-	[ "$SKIPTYPE" = skip ]&&pass "$1"&&return
+	[ "$TAP_SkipType" = skip ]&&pass "$1"&&return
 	local r
 	local n
 	n=$1
 	shift
-	if r=$(eval "$@")
+	if r=$("$@")
 	then pass "$n"
 	else
 		fail "$n {$*} code $?"
