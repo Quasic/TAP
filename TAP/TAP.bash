@@ -4,7 +4,7 @@
 #released under Creative Commons Attribution (BY) 4.0 license
 #Please report bugs at https://github.com/Quasic/TAP/issues
 
-printf '#TAP testing %s (TAP.bash version 0.8 alpha)\n' "$1"
+printf '#TAP testing %s (TAP.bash version 1.0 beta)\n' "$1"
 case "$2" in
 '?') TAP_NumTests='?';;
 *[!0-9]*|'') printf '1..0 #Skipped: %s\n' "$2";TAP_NumTests=0;;
@@ -80,24 +80,48 @@ todo(){
 }
 diag(){
 	if [ $# -eq 0 ]
-	then prefixblock '#'
+	then
+		local r
+		while read -r r
+		do printf '#%s\n' "$r"
+		done
 	elif [ "$1" != '' ]
-	then prefixblock '#'<<<"$1"
+	then diag<<<"$1"
 	fi
 }
-subtest(){
-	if [ $# -eq 0 ]
-	then prefixblock '    '
-	elif [ "$1" != '' ]
-	then prefixblock '    '<<<"$1"
-	fi
-}
-prefixblock(){
+#Subtestrun ignores everything except "not ok ..." which fails the test even if the exit code is 0, and "Bail out!  ...", which bails out the parent test both passively (via TAP reader/harness) and actively (with a second bailout)
+subtestrun(){
+	[ "$TAP_SkipType" = skip ]&&pass "$1"&&return
+	local n
 	local r
-	while read -r r
-	do
-		printf '%s\n' "$1$r"
-	done
+	local s
+	local f
+	if r=$(eval "$1")
+	then
+		f=0
+	else
+		f=$?
+		fail "$2 ($1) code $f"
+		printf '{\n'
+	fi
+	n="$f"
+	if [ "$r" != '' ]
+	then
+		while read -r s
+		do
+			printf '    %s\n' "$s"
+			[ "$n" = 0 ]&&[[ "$s" =~ ^not\ ok( |$) ]]&&n=1
+			[[ "$s" =~ ^[\ \\t]*Bail\ out!\ \  ]]&&n=bail
+		done<<<"$r"
+	fi
+	if [ "$f" -gt 0 ]
+	then printf '}\n'
+	elif [ "$n" = 0 ]
+	then pass "$2"
+	else fail "$2 ($1) code $f parsecode $n"
+	fi
+	[ "$n" = bail ]&&bailout "subtest $2 bailout"
+	return $n
 }
 wasok(){
 	local r=$?
