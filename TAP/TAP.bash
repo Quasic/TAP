@@ -4,7 +4,7 @@
 #released under Creative Commons Attribution (BY) 4.0 license
 #Please report bugs at https://github.com/Quasic/TAP/issues
 
-printf '#TAP testing %s (TAP.bash version 1.0 beta)\n' "$1"
+printf '#TAP testing %s (TAP.bash version 1.0)\n' "$1"
 case "$2" in
 '?') TAP_NumTests='?';;
 *[!0-9]*|'') printf '1..0 #Skipped: %s\n' "$2";TAP_NumTests=0;;
@@ -89,39 +89,39 @@ diag(){
 	then diag<<<"$1"
 	fi
 }
-#Subtestrun ignores everything except "not ok ..." which fails the test even if the exit code is 0, and "Bail out!  ...", which bails out the parent test both passively (via TAP reader/harness) and actively (with a second bailout)
-subtestrun(){
-	[ "$TAP_SkipType" = skip ]&&pass "$1"&&return
-	local n
-	local r
-	local s
-	local f
-	if r=$(eval "$1")
-	then
-		f=0
-	else
-		f=$?
-		fail "$2 ($1) code $f"
-		printf '{\n'
+subtest(){	#name, num, function/code; auto endTests
+	[ "$TAP_SkipTests" -gt 0 ]&&[ "$TAP_SkipType" = skip ]&&pass "$1"&&return
+	printf '#TAP subtesting %s\n' "$1"
+	case "$2" in
+	'?') true;;
+	*[!0-9]*|'')
+		printf '    1..0 #Skipped: %s\n' "$2"
+		pass "$1 # Skip $2"
+		return 0
+	esac
+	(
+		if [ "$2" = '?' ]
+		then TAP_NumTests='?'
+		else
+			printf '1..%i\n' "$2"
+			TAP_NumTests=$2
+		fi
+		TAP_TestsRun=0
+		TAP_TestsFailed=0
+		TAP_SkipTests=0
+		trap endtests EXIT
+		if [ $# -eq 3 ]
+		then eval "$3"
+		else shift 2;"$@"
+		fi
+	)|gawk '/^[ \t]Bail out!  /{bailed=1}{print"    "$0}END{if(bailed)exit 1}'
+	local -a r=(${PIPESTATUS[@]})
+	[ "${r[1]}" = 1 ]&&bailout
+	if [ "${r[0]}" = 0 ]
+	then pass "$1"
+	else fail "$1, code ${r[0]}"
+		return ${r[0]}
 	fi
-	n="$f"
-	if [ "$r" != '' ]
-	then
-		while read -r s
-		do
-			printf '    %s\n' "$s"
-			[ "$n" = 0 ]&&[[ "$s" =~ ^not\ ok( |$) ]]&&n=1
-			[[ "$s" =~ ^[\ \\t]*Bail\ out!\ \  ]]&&n=bail
-		done<<<"$r"
-	fi
-	if [ "$f" -gt 0 ]
-	then printf '}\n'
-	elif [ "$n" = 0 ]
-	then pass "$2"
-	else fail "$2 ($1) code $f parsecode $n"
-	fi
-	[ "$n" = bail ]&&bailout "subtest $2 bailout"
-	return $n
 }
 wasok(){
 	local r=$?
@@ -131,7 +131,7 @@ wasok(){
 	fi
 }
 okrun(){
-	[ "$TAP_SkipType" = skip ]&&pass "$2"&&return
+	[ "$TAP_SkipTests" -gt 0 ]&&[ "$TAP_SkipType" = skip ]&&pass "$2"&&return
 	local r
 	if r=$(eval "$1")
 	then pass "$2"
@@ -142,7 +142,7 @@ okrun(){
 	fi
 }
 okname(){
-	[ "$TAP_SkipType" = skip ]&&pass "$1"&&return
+	[ "$TAP_SkipTests" -gt 0 ]&&[ "$TAP_SkipType" = skip ]&&pass "$1"&&return
 	local r
 	local n
 	n=$1
