@@ -1,7 +1,7 @@
 #!/bin/bash
 Version=0.1a
 if [ "$1" = --help ]||[ "$1" = -h ]||[ "$2" = --help ]||[ "$2" = -h ]
-then printf 'testcases.sh version %s
+then printf '%s
 sets up prove to run TAP testcases
 Usage: bash [-i] TAP/testcases.sh RepoName [arguments]
 -i        enables the interactive menu
@@ -11,7 +11,7 @@ arguments options and tests as passed to prove (See prove --help)
 by Quasic [https://quasic.github.io]
 Released under Creative Commons Attribution (BY) 4.0 license
 Report bugs to https://github.com/Quasic/TAP/issues
-' "$Version"
+' "${BASH_SOURCE[0]} $Version"
 	exit
 fi
 useRC=1
@@ -79,7 +79,7 @@ P show all errors (-p option)
 	[ "$useRC" = 1 ]&&printf 'do not '
 	printf 'use .proverc\n'
 }
-printf '\e]0;%s testcases\e\\%s testcases (%s):\n' "$1" "$1" "$0 version $Version"
+printf '\e]0;%s testcases\e\\%s testcases (%s):\n' "$1" "$1" "${BASH_SOURCE[0]} $Version"
 shift
 if cd "$(dirname "${BASH_SOURCE[0]}")/.."
 then
