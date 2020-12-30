@@ -1,4 +1,5 @@
 #!/bin/bash
+cd "$(dirname "${BASH_SOURCE[0]}")/.."||exit 1
 source TAP/TAP.bash 'TAP.bash testcases' 30
 pass 'TAP dummy pass'
 skip 'TAP dummy' 5

@@ -4,7 +4,7 @@
 #released under Creative Commons Attribution (BY) 4.0 license
 #Please report bugs at https://github.com/Quasic/TAP/issues
 
-printf '#TAP testing %s (TAP.bash version 1.0)\n' "$1"
+printf '#TAP testing %s (TAP.bash version 1.0c)\n' "$1"
 case "$2" in
 '?') TAP_NumTests='?';;
 *[!0-9]*|'') printf '1..0 #Skipped: %s\n' "$2";TAP_NumTests=0;;
@@ -26,7 +26,7 @@ endtests(){
 		printf '#Planned %i tests, but ran %i tests\n' "$TAP_NumTests" "$TAP_TestsRun"
 		TAP_TestsFailed=255
 	fi
-	[[ $- == *i* ]]&&read -rn1 -p "Press a key to close log (will return $TAP_TestsFailed)">&2
+	[ "$1" != noi ]&&[[ $- == *i* ]]&&read -rn1 -p "Press a key to close log (will return $TAP_TestsFailed)">&2
 	exit $TAP_TestsFailed
 }
 bailout(){
@@ -108,20 +108,28 @@ subtest(){	#name, num, function/code; auto endTests
 		fi
 		TAP_TestsRun=0
 		TAP_TestsFailed=0
+		#shellcheck disable=SC2030
 		TAP_SkipTests=0
-		trap endtests EXIT
+		trap 'endtests noi' EXIT
 		if [ $# -eq 3 ]
 		then eval "$3"
 		else shift 2;"$@"
 		fi
-	)|gawk '/^[ \t]Bail out!  /{bailed=1}{print"    "$0}END{if(bailed)exit 1}'
-	local -a r=(${PIPESTATUS[@]})
-	[ "${r[1]}" = 1 ]&&bailout
-	if [ "${r[0]}" = 0 ]
+	)|gawk '/^[ \t]Bail out!  /{bailed=1}{print"    "$0}END{if(bailed)exit 255}'
+	local -a m=("${PIPESTATUS[@]}")
+	if [ "${m[0]}" = 0 ]
 	then pass "$1"
-	else fail "$1, code ${r[0]}"
-		return ${r[0]}
+	else fail "$1, code ${m[0]}"
 	fi
+	case "${m[1]}" in
+	0) true;;
+	1) printf '#Subtest gawk parser error';;
+	2) printf '#Subtest fatal gawk parser error';;
+	127) bailout 'gawk not found';;
+	255) bailout "subtest bailed out";;
+	*) printf '#Subtest parser returned unknown exit status %i\n' "${m[1]}"
+	esac
+	return "${m[0]}"
 }
 wasok(){
 	local r=$?
@@ -131,6 +139,7 @@ wasok(){
 	fi
 }
 okrun(){
+	#shellcheck disable=SC2031
 	[ "$TAP_SkipTests" -gt 0 ]&&[ "$TAP_SkipType" = skip ]&&pass "$2"&&return
 	local r
 	if r=$(eval "$1")
@@ -142,6 +151,7 @@ okrun(){
 	fi
 }
 okname(){
+	#shellcheck disable=SC2031
 	[ "$TAP_SkipTests" -gt 0 ]&&[ "$TAP_SkipType" = skip ]&&pass "$1"&&return
 	local r
 	local n
