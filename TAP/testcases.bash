@@ -8,6 +8,7 @@ Usage: bash [-i] TAP/testcases.sh RepoName [arguments]
 RepoName  is the name to display in the log
 arguments options and tests as passed to prove (See prove --help)
 
+by Quasic [https://quasic.github.io]
 Released under Creative Commons Attribution (BY) 4.0 license
 Report bugs to https://github.com/Quasic/TAP/issues
 ' "$Version"
