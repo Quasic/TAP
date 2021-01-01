@@ -1,5 +1,5 @@
 #!/bin/bash
-Version=0.1a
+Version=0.1b
 if [ "$1" = --help ]||[ "$1" = -h ]||[ "$2" = --help ]||[ "$2" = -h ]
 then printf '%s
 sets up prove to run TAP testcases
@@ -38,6 +38,9 @@ menu(){
 		then printf 'Using .proverc:\n%s\n' "$(<.proverc)"
 		else printf 'No .proverc found to use\n'
 		fi;;
+	'/') for f in TAP/lintTAP*
+		do t[${#t[@]}]="$f"
+		done;;
 	'#') a=()
 		[ "$useRC" = 1 ]||a[0]=--norc
 		[ "${#t[@]}" = 0 ]&&a[${#a[@]}]=--state=slow
@@ -66,6 +69,7 @@ Q quit without running any tests
 %% clear options except --norc (,) and --state=[test group]
 _ clear tests
 . save test info to .prove
+/ add TAP/lintTAP*
 '
 	[ -f .prove ]&&printf 'L run tests ran at last save
 - run tests that failed last save (save again to eliminate new passes)
@@ -119,20 +123,18 @@ then
 			then t[${#t[@]}]="$f"
 			else o[${#o[@]}]="$f"
 			fi
-		elif [ -f "t/$f.t" ]
-		then t[${#t[@]}]="t/$f.t"
-		elif [ -f "t/tap$f" ]
-		then t[${#t[@]}]="t/tap$f"
-		elif [ -f "t/testcases$f" ]
-		then t[${#t[@]}]="t/testcases$f"
-		elif [ -f "t/testcasesTAP$f" ]
-		then t[${#t[@]}]="t/testcasesTAP$f"
-		elif [ -f "t/$f" ]
-		then t[${#t[@]}]="t/$f"
 		elif [ "${f:0:7}" = lintTAP ]&&[ -f "TAP/$f" ]
 		then t[${#t[@]}]="TAP/$f"
-		else printf 'No test was found for %s\n' "$f"
+		else
+			n=${#t[@]}
+			for q in t/"$f".* "t/$f" "t/testcases$f"
+			do [ -f "$q" ]&&t[${#t[@]}]="$q"
+			done
+			[ "$n" = ${#t[@]} ]&&printf 'No test was found for %s\n' "$f"
 		fi
+	done
+	for q in t/testcases.*
+	do [ -f "$q" ]&&t[${#t[@]}]="$q"
 	done
 	printf 'PERL5LIB=%s\n' "$PERL5LIB"
 	[ -f .proverc ]&&printf '.proverc:\n%s\n' "$(<.proverc)"
@@ -149,11 +151,11 @@ then
 			read -rn1 q
 			printf '\n'
 		done
-	else printf 'prove %s\n' "${o[*]} ${t[*]}"
 	fi
 	[ "$useRC" = 1 ]||o[${#o[@]}]=--norc
 	#shellcheck disable=SC2191
 	[ "${#t[@]}" = 0 ]&&t=(--state=slow)
+	printf 'prove %s\n' "${o[*]} ${t[*]}"
 	prove "${o[@]}" "${t[@]}"
 	r=$?
 	if [ $r = 0 ]
