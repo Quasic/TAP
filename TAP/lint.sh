@@ -1,25 +1,34 @@
 #!/bin/bash
-if [ $# -eq 0 ]||[ "$1" = '--help' ]||[ "$1" = '-h' ]
+Version=1.0a
+dir=$(dirname "${BASH_SOURCE[0]}")
+libver="$(bash --version|head -n1); $(gawk -v help=version -f "$dir/lintparse.awk")"
+hasCScript=$(command -v cscript.exe)&&libver="$libver; $(cscript.exe //Nologo //Job:version "$dir/lint.wsf")"
+hasShellcheck=$(command -v shellcheck)&&libver="$libver; shellcheck $(shellcheck --version|gawk '/^version:/{print $2;exit}')"
+hasNode=$(node --version 2>/dev/null)&&libver="$libver; node $hasNode" #node alias w/o node in Msys
+printf '#TAP lint.sh %s; %s\n' "$Version" "$libver"
+[ "$1" = '--version' ]&&exit
+if [ "$1" = '--help' ]||[ "$1" = '-h' ]
 then
-	printf 'Usage: %s [options] [list of files to lint]\nOptions:\n-p do NOT check portability\n-h or --help for this display\n' "$0"
+	printf 'tries to detect file types and use available linters to generate TAP output
+Usage: [bash] %s [option] [list of files to lint]
+Options:
+-p do NOT check portability
+-h or --help for this display
+
+by Quasic [https://quasic.github.io]
+Please report bugs at https://github.com/Quasic/TAP/issues
+Released under Creative Commons Attribution (BY) 4.0 license
+' "$0"
 	[[ $- == *i* ]]&&read -rn1 -p "Press a key to close help">&2
 	exit
 fi
-hasCScript=$(command -v cscript.exe)
-hasNode=$(command -v node)
-hasShellcheck=$(command -v shellcheck)
 if [ "$1" = '-p' ]
 then
 	portability='n'
 	shift
 fi
-if [ $# -eq 1 ]
-then t="lint.sh $1"
-else t='lint.sh [list of files]'
-fi
-dir=$(dirname "${BASH_SOURCE[0]}")
-#shellcheck source=TAP/TAP.sh
-source "$dir/TAP.sh" "$t" '?'
+#shellcheck source=TAP/TAP.bash
+source "$dir/TAP.bash" "$*" '?'
 for f in "$@"
 do
 	F="$f"
@@ -40,31 +49,43 @@ do
 	okname "$f is file" [ -f "$f" ]
 	okname "$f has contents" [ -s "$f" ]||continue
 	read -r shebang<"$f";wasok "$f read"
-	if [[ "$f" =~ \.(ba?|)sh$ ]]||[[ "$shebang" =~ ^\#!(.*/)?bash( |$) ]]
+	if [[ "$shebang" =~ ^\#!(.*/)?(bash|dash|ksh|node|perl|sh)( |$) ]]||[[ "$shebang" =~ ^\#!(.*/)?(g?awk|sed)( .*|)\ -f$ ]]
+	then y="${BASH_REMATCH[2]}"
+	elif [[ "${shebang,,}" =~ ^(\'|//|/*|rem |<!--)\#!(.*/|)cscript\.exe( |$) ]]
 	then
-		okname "$f lint bash" bash -n "$f"
+		case "${BASH_REMATCH[1]}" in
+		"'"|'rem ')y=vbs;;
+		'//'|'/*')y=js;;
+		'<!--')y=wsf;;
+		*)y='?';;
+		esac
+	elif [[ "$f" =~ \.(g?awk|bash|dash|hta|js|ksh|sed|sh|vbs|ws[cf]|xhtml)$ ]]
+	then y="${BASH_REMATCH[1]}"
+	elif [[ "$f" =~ \.(b|d)sh$ ]]
+	then y="${BASH_REMATCH[1]}ash"
+	elif [[ "$f" =~ \.p(lx?|m)$ ]]
+	then y=perl
+	else y='?'
+	fi
+	if [[ "$y" =~ ^(bash|dash|ksh|sh)$ ]]
+	then
+		okname "$f lint $y" "$y" -n "$f"
 		[ "$hasShellcheck" != '' ]&&okname "$f shellcheck" shellcheck -x "$f"
-	elif [ "$hasShellcheck" != '' ]&&[[ "$f" =~ \.zsh$ ]]
-	then okname "$f shellcheck" shellcheck -x "$f"
-	elif [ "$hasShellcheck" != '' ]&&[[ "$shebang" =~ ^\#!(.*/)?zsh( |$) ]]
-	then okname "$f shellcheck" shellcheck -x "$f"
-	elif [[ "$f" =~ \.p(lx?|m)$ ]]||[[ "$shebang" =~ ^\#!(.*/)?perl( |$) ]]
+	elif [ "$y" = perl ]
 	then okname "$f lint Perl" perl -wct "$f"
-	elif [[ "$f" =~ \.g?awk$ ]]||[[ "$shebang" =~ ^\#!(.*/|)g?awk\ .*-f$ ]]
-	then gawk --lint -e 'BEGIN{exit 0}END{exit 0}' -f "$f" 2>&1|gawk -v file="$f" -v shebang="$shebang" -f "$dir/lintparse.awk"||((TESTSFAILED++))
+	elif [[ "$y" =~ ^g?awk$ ]]
+	then gawk --lint -e 'BEGIN{exit 0}END{exit 0}' -f "$f" 2>&1|gawk -v file="$f" -v dialect="$y" -v shebang="$shebang" -f "$dir/lintparse.awk"||((TESTSFAILED++))
 		((TESTSRUN++))
-	# elif [ "$f" = '.sed' ]||[[ "$shebang" =~ ^\#!(.*/)?sed( .*)? (-f|--file=)$ ]]
+	# elif [ "$y" = sed ]
 	# then
-	elif [ "$hasNode" != '' ]&&[[ "$shebang" =~ ^#!(.*/)?node( |$) ]]
-	then okname "$f lint node.js" node -c "$f"
-	elif [ "$hasCScript" != '' ]&&[[ "$shebang" =~ ^(\'|//|/*|[Rr][Ee][Mm] |<!--)\#!(.*/|)cscript\.exe( |$) ]]
-	then okname "$f lint cscript" cscript //Nologo //Job:lint lint.wsf "$f"
-	elif [ "$hasNode" != '' ]&&[[ "$f" =~ \.js$ ]]
-	then okname "$f lint node.js" node -c "$f"
-	elif [ "$hasCScript" != '' ]&&[[ "$f" =~ \.(js|vbs|wsf)$ ]]
-	then okname "$f lint cscript" cscript //Nologo //Job:lint lint.wsf "$f"
+	elif [ "$y" = node ]
+	then [ "$hasNode" != '' ]&&okname "$f lint node.js" node -c "$f"
+	elif [[ "$y" =~ ^(js|vbs|wsf|wsc|hta|xhtml)$ ]]
+	then
+		[ "$hasCScript" != '' ]&&okname "$f lint cscript.exe" cscript.exe //Nologo //Job:lint "$dir/lint.wsf" "$f"
+		[ "$y" = js ]&&[ "$hasNode" != '' ]&&okname "$f lint node.js" node -c "$f"
 	else
-		skip "Unknown lint type <$f> shebang: $shebang" 1
+		skip "$f Unknown lint type $y shebang: $shebang" 1
 		fail 'no lint'
 	fi
 done
