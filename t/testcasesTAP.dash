@@ -44,4 +44,4 @@ printf 'redirection diag'|diag
 diag 'testing diag
 not ok - diag
 TAP tests END'
-endTests
+endtests
