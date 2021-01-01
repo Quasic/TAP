@@ -1,10 +1,11 @@
 #!/bin/bash
+Version=1.0d
 #TAP format testcase library for bash
 #by Quasic
 #released under Creative Commons Attribution (BY) 4.0 license
 #Please report bugs at https://github.com/Quasic/TAP/issues
 
-printf '#TAP testing %s (TAP.bash version 1.0c)\n' "$1"
+printf '#TAP testing %s (TAP.bash %s)\n' "$1" "$Version"
 case "$2" in
 '?') TAP_NumTests='?';;
 *[!0-9]*|'') printf '1..0 #Skipped: %s\n' "$2";TAP_NumTests=0;;
@@ -26,7 +27,7 @@ endtests(){
 		printf '#Planned %i tests, but ran %i tests\n' "$TAP_NumTests" "$TAP_TestsRun"
 		TAP_TestsFailed=255
 	fi
-	[ "$1" != noi ]&&[[ $- == *i* ]]&&read -rn1 -p "Press a key to close log (will return $TAP_TestsFailed)">&2
+	[ "$TAP_subtest" != 1 ]&&[[ $- == *i* ]]&&read -rn1 -p "Press a key to close log (will return $TAP_TestsFailed)">&2
 	exit $TAP_TestsFailed
 }
 bailout(){
@@ -110,7 +111,8 @@ subtest(){	#name, num, function/code; auto endTests
 		TAP_TestsFailed=0
 		#shellcheck disable=SC2030
 		TAP_SkipTests=0
-		trap 'endtests noi' EXIT
+		TAP_subtest=1
+		trap endtests EXIT
 		if [ $# -eq 3 ]
 		then eval "$3"
 		else shift 2;"$@"
