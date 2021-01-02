@@ -8,3 +8,4 @@
 *.vbs text eol=crlf
 *.wsf text eol=crlf
 *.ps1 text eol=crlf
+*.prove text eol=lf
