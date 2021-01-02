@@ -1,5 +1,9 @@
+# TAP format testcase library for awk
+# By Quasic
+# Report bugs to https://github.com/Quasic/TAP/issues
+# Released under Creative Commons Attribution (BY) 4.0 license
 function startTests(name,num){
-print "#TAP testing "(TESTSERIES=name)
+print "#TAP testing "(TESTSERIES=name)" (TAP.awk 1.0)"
 if(+num>0){
 	print "1.."(NUMTESTS=num)
 }else{
