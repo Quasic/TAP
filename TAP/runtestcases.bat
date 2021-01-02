@@ -1,5 +1,5 @@
-rem @echo off
-echo # runtestcases.bat 0.1
+@echo off
+echo # runtestcases.bat 0.1a
 :while
 cd
 if exist testcases.sh goto test
