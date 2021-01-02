@@ -1,5 +1,5 @@
 #!/bin/bash
-Version=0.1d
+Version=0.1e
 if [ "$1" = --help ]||[ "$1" = -h ]||[ "$2" = --help ]||[ "$2" = -h ]
 then printf '%s
 sets up prove to run TAP testcases
@@ -91,7 +91,7 @@ then
 	then
 		printf 'Reading /sys/devices/system/cpu/present...'
 		cpus=$(</sys/devices/system/cpu/present)
-		cpus="${cpus:2}"
+		cpus=$((${cpus:2}+1))
 	elif [ -f /proc/stat ]
 	then
 		printf 'Reading /proc/stat...'
