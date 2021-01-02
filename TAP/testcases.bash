@@ -1,5 +1,5 @@
 #!/bin/bash
-Version=0.1b
+Version=0.1c
 if [ "$1" = --help ]||[ "$1" = -h ]||[ "$2" = --help ]||[ "$2" = -h ]
 then printf '%s
 sets up prove to run TAP testcases
@@ -111,7 +111,7 @@ then
 		for f in TAP/Parser/SourceHandler/*.pm
 		do [[ "$f" =~ ^TAP/Parser/SourceHandler/(.*)\.pm$ ]]&&o[${#o[@]}]="--source=${BASH_REMATCH[1]}"
 		done
-		PERL5LIB="$(realpath .;[ "$PERL5LIB" = '' ]||perl -V:path_sep)$PERL5LIB"
+		PERL5LIB="$(eval "$(perl -V:path_sep)";realpath .;[ "$PERL5LIB" = '' ]||printf '%s' "$path_sep")$PERL5LIB"
 	fi
 	for f
 	do
