@@ -1,13 +1,17 @@
 #!/bin/bash
-printf '#TAP lint.sh 1.0b'
+printf '#TAP lint.sh 1.0c'
 [ "$1" = '--version' ]&&printf '\n'&&exit
 dir=$(dirname "${BASH_SOURCE[0]}")
 declare -A has
-printf '; %s' "$(bash --version|head -n1); $(gawk -v help=version -f "$dir/lintparse.awk")"
+printf '; %s' "$(bash --version|head -n1)"
+command -v gawk>/dev/null&&
+	y=$(gawk -v help=version -f "$dir/lintparse.awk")&&
+	has[gawk]="$y"&&
+	printf '; %s' "$y"
 command -v make>/dev/null&&
 	y=$(make --version)&&
 	has[make]="$y"&&
-	gawk '{sub(/,.*$/,"");printf "; %s",$0;exit}'<<<"$y"
+	awk '{sub(/,.*$/,"");printf "; %s",$0;exit}'<<<"$y"
 command -v cscript.exe>/dev/null&&
 	y=$(cscript.exe //Nologo //Job:version "$dir/lint.wsf")&&
 	has[CScript]="$y"&&
@@ -15,7 +19,7 @@ command -v cscript.exe>/dev/null&&
 command -v shellcheck>/dev/null&&
 	y=$(shellcheck --version)&&
 	has[shellcheck]="$y"&&
-	gawk '/^version:/{printf "; shellcheck %s",$2;exit}'
+	awk '/^version:/{printf "; shellcheck %s",$2;exit}'
 command -v node>/dev/null&&
 	y=$(node --version 2>/dev/null)&&
 	has[node]="$y"&&
@@ -92,7 +96,8 @@ do
 		[ "${has[shellcheck]}" != '' ]&&okname "$f shellcheck" shellcheck -x "$f"
 	elif [ "$y" = perl ]
 	then okname "$f lint Perl" perl -wct "$f"
-	elif [[ "$y" =~ ^g?awk$ ]]
+	elif [[ "$y" =~ ^g?awk$ ]]&&
+		[ "${has[gawk]}" != '' ]
 	then gawk --lint -e 'BEGIN{exit 0}END{exit 0}' -f "$f" 2>&1|gawk -v file="$f" -v dialect="$y" -v shebang="$shebang" -f "$dir/lintparse.awk"||((TAP_TestsFailed++))
 		((TAP_TestsRun++))
 	# elif [ "$y" = sed ]
