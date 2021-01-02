@@ -1,5 +1,5 @@
 #!/bin/bash
-printf '#TAP lint.sh 1.0c'
+printf '#TAP lint.sh 1.0d'
 [ "$1" = '--version' ]&&printf '\n'&&exit
 dir=$(dirname "${BASH_SOURCE[0]}")
 declare -A has
@@ -24,6 +24,10 @@ command -v node>/dev/null&&
 	y=$(node --version 2>/dev/null)&&
 	has[node]="$y"&&
 	printf '; node %s' "$y" #node alias w/o node in Msys
+command -v gcc>/dev/null&&
+	y=$(gcc -dumpversion 2>/dev/null)&&
+	has[gcc]="$y"&&
+	printf '; gcc %s' "$y ($(gcc -dumpmachine))"
 printf '\n'
 [ "$1" = '--versions' ]&&exit
 if [ "$1" = '--help' ]||[ "$1" = '-h' ]
@@ -86,6 +90,8 @@ do
 	then y="${BASH_REMATCH[1]}ash"
 	elif [[ "$f" =~ \.p(lx?|m)$ ]]
 	then y=perl
+	elif [[ "$f" =~ \.[ch]$ ]]
+	then y=c
 	elif [ "$f" = Makefile ]
 	then y=make
 	else y='?'
@@ -118,6 +124,11 @@ do
 	elif [[ "$y" =~ ^(vbs|wsf|wsc|hta|xhtml)$ ]]&&
 		[ "${has[CScript]}" != '' ]
 	then okname "$f lint cscript.exe" cscript.exe //Nologo //Job:lint "$dir/lint.wsf" "$f"
+	elif [ "$y" = c ]&&[ "${has[gcc]}" != '' ]
+	then
+		okname "preprocess $f" gcc -E "$f" -o /dev/null
+		okname "compile $f" gcc -S "$f" -o /dev/null
+		okname "assemble $f" gcc -c "$f" -o /dev/null
 	else
 		skip "$f Unknown lint type $y shebang: $shebang" 1
 		fail 'no lint'
