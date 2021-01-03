@@ -1,7 +1,6 @@
 #!/bin/bash
-Version=0.1e
 if [ "$1" = --help ]||[ "$1" = -h ]||[ "$2" = --help ]||[ "$2" = -h ]
-then printf '%s
+then printf '%s 0.1f
 sets up prove to run TAP testcases
 Usage: bash [-i] TAP/testcases.sh RepoName [arguments]
 -i        enables the interactive menu
@@ -11,7 +10,7 @@ arguments options and tests as passed to prove (See prove --help)
 by Quasic [https://quasic.github.io]
 Released under Creative Commons Attribution (BY) 4.0 license
 Report bugs to https://github.com/Quasic/TAP/issues
-' "${BASH_SOURCE[0]} $Version"
+' "${BASH_SOURCE[0]}"
 	exit
 fi
 useRC=1
@@ -31,6 +30,9 @@ menu(){
 	S) o[${#o[@]}]=--shuffle;;
 	Q) exit;;
 	'.') o[${#o[@]}]=--state=save;;
+	'@') export TAP_HARNESS_SOURCE_FACTORY_VOTES=$((1-TAP_HARNESS_SOURCE_FACTORY_VOTES))
+		[ "$TAP_HARNESS_SOURCE_FACTORY_VOTES" = 1 ]||printf 'not '
+		printf 'showing SourceHandler votes';;
 	',') useRC=$((1-useRC))
 		if [ "$useRC" != 1 ]
 		then printf 'Not using .proverc\n'
@@ -52,6 +54,9 @@ menu(){
 		printf 'Returned code %i\n' $?;;
 	'%') o=();;
 	'_') t=();;
+	'"') read -rep './' q&&
+		[ -f "$q" ]&&
+		t[${#t[@]}]="$q";;
 	*) printf 'Unknown command: %s\n' "$1"
 	esac
 	a=()
@@ -68,15 +73,17 @@ Q quit without running any tests
 ! run tests and return to this menu
 %% clear options except --norc (,) and --state=[test group]
 _ clear tests
+" add test
 . save test info to .prove
 / add TAP/lintTAP*
+P show all errors (-p option)
+@ toggle showing SourceHandler votes
 '
 	[ -f .prove ]&&printf 'L run tests ran at last save
 - run tests that failed last save (save again to eliminate new passes)
 + run tests that passed last save (check for new errors)
 F run any tests modified since last save
 * run all tests in fastest to slowest order
-P show all errors (-p option)
 '
 	[ ${#t[@]} -gt 1 ]&&printf 'S to shuffle\n'
 	printf ', '
@@ -111,7 +118,7 @@ then
 		for f in TAP/Parser/SourceHandler/*.pm
 		do [[ "$f" =~ ^TAP/Parser/SourceHandler/(.*)\.pm$ ]]&&o[${#o[@]}]="--source=${BASH_REMATCH[1]}"
 		done
-		PERL5LIB="$(realpath .)$(if [ "$PERL5LIB" != '' ];then eval "$(perl -V:path_sep)";printf '%s' "$path_sep$PERL5LIB";fi)"
+		export PERL5LIB="$(realpath .)$(if [ "$PERL5LIB" != '' ];then eval "$(perl -V:path_sep)";printf '%s' "$path_sep$PERL5LIB";fi)"
 	fi
 	for f
 	do
