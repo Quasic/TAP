@@ -1,6 +1,7 @@
 #!/bin/bash
+Version=0.1g
 if [ "$1" = --help ]||[ "$1" = -h ]||[ "$2" = --help ]||[ "$2" = -h ]
-then printf '%s 0.1f
+then printf '%s
 sets up prove to run TAP testcases
 Usage: bash [-i] TAP/testcases.sh RepoName [arguments]
 -i        enables the interactive menu
@@ -10,7 +11,7 @@ arguments options and tests as passed to prove (See prove --help)
 by Quasic [https://quasic.github.io]
 Released under Creative Commons Attribution (BY) 4.0 license
 Report bugs to https://github.com/Quasic/TAP/issues
-' "${BASH_SOURCE[0]}"
+' "${BASH_SOURCE[0]} $Version"
 	exit
 fi
 useRC=1
@@ -118,7 +119,9 @@ then
 		for f in TAP/Parser/SourceHandler/*.pm
 		do [[ "$f" =~ ^TAP/Parser/SourceHandler/(.*)\.pm$ ]]&&o[${#o[@]}]="--source=${BASH_REMATCH[1]}"
 		done
-		export PERL5LIB="$(realpath .)$(if [ "$PERL5LIB" != '' ];then eval "$(perl -V:path_sep)";printf '%s' "$path_sep$PERL5LIB";fi)"
+		#shellcheck disable=SC2154
+		PERL5LIB="$(realpath .)$(if [ "$PERL5LIB" != '' ];then eval "$(perl -V:path_sep)";printf '%s' "$path_sep$PERL5LIB";fi)"
+		export PERL5LIB
 	fi
 	for f
 	do
@@ -174,4 +177,5 @@ else
 	printf '\e]0;[Failed to start] %s testcases\e\\Failed to chdir!\n' "$TESTING"
 fi
 [[ "$-" =~ 'i' ]]&&read -rn1 -p 'Press a key to close log...'
+printf '\e]0;\e'\\
 exit $r
