@@ -1,0 +1,2 @@
+#!/bin/dash
+awk -f TAP/TAP.awk -f t/lib/testcasesTAP.awk </dev/null

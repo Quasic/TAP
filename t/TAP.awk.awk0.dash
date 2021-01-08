@@ -1,6 +1,5 @@
-#!/usr/bin/gawk -f
-@include "./TAP/TAP.awk"
-BEGIN{
+#!/bin/dash
+awk -f TAP/TAP.awk -e 'BEGIN{
 startTests("gitscripts textconv awk testcases","skip test test")
 endTests()
-}
+}'

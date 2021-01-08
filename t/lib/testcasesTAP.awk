@@ -1,0 +1,16 @@
+BEGIN{
+startTests("TAP.awk testcases",10)
+pass("TAP dummy pass")
+skip("TAP test",2)
+	pass("TAP dummy pass")
+	fail("TAP dummy fail")
+todo("TAP TODO test",4)
+	fail("TAP dummy TODO fail")
+	ok(5==6,"okfail")
+	is(5,6,"isfail")
+	isnt(6,6,"isntfail")
+ok(1==1,"okpass")
+is(5,5,"ispass")
+isnt(5,6,"isntpass")
+diag("awk tests END")
+}

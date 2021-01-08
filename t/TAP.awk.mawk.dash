@@ -1,0 +1,7 @@
+#!/bin/dash
+if command -v mawk>/dev/null
+then mawk -f TAP/TAP.awk -f t/lib/testcasesTAP.awk </dev/null
+else
+	. TAP/TAP.dash
+	startTests 'mawk testcases' 'no mawk found to test'
+fi
