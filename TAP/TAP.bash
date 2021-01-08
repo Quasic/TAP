@@ -1,11 +1,10 @@
 #!/bin/bash
-Version=1.0d
 #TAP format testcase library for bash
 #by Quasic
 #released under Creative Commons Attribution (BY) 4.0 license
 #Please report bugs at https://github.com/Quasic/TAP/issues
 
-printf '#TAP testing %s (TAP.bash %s)\n' "$1" "$Version"
+printf '#TAP testing %s (TAP.bash 1.0e)\n' "$1"
 case "$2" in
 '?') TAP_NumTests='?';;
 *[!0-9]*|'') printf '1..0 #Skipped: %s\n' "$2";TAP_NumTests=0;;
@@ -107,7 +106,9 @@ subtest(){	#name, num, function/code; auto endTests
 			printf '1..%i\n' "$2"
 			TAP_NumTests=$2
 		fi
+		#shellcheck disable=SC2030
 		TAP_TestsRun=0
+		#shellcheck disable=SC2030
 		TAP_TestsFailed=0
 		#shellcheck disable=SC2030
 		TAP_SkipTests=0
