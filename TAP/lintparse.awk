@@ -1,6 +1,7 @@
 #!/bin/gawk -v help=usage -f
 BEGIN{
-	if(help)print "lintparse.awk 1.0; GNU Awk "PROCINFO["version"]", API: "PROCINFO["api_major"]"."PROCINFO["api_minor"]"; "PROCINFO["mpfr_version"]"; "PROCINFO["gmp_version"]
+	Version="lintparse.awk 1.0a; GNU Awk "PROCINFO["version"]", API: "PROCINFO["api_major"]"."PROCINFO["api_minor"]"; "PROCINFO["mpfr_version"]"; "PROCINFO["gmp_version"]
+	if(help)print Version
 	else if(!"file" in SYMTAB){
 		print "ERROR: file variable is required"
 		help="err"
@@ -60,10 +61,10 @@ END{
 	if(LIB)W=W"\n#Unused Library functions:"LIB
 	if(HOOKS)W=W"\n#Unused hooks:"HOOKS
 	if(X){
-		print"not ok - "file" lint "(gawk?"g":"")"awk\n#Errors:"X
+		print"not ok - "file" lint "(gawk?"g":"")"awk\n# "Version"\n#Errors:"X
 		if(W)print"#Warnings/Info:"W
 		exit 1
 	}
 	print"ok - "file" lint "(gawk?"gawk":"awk")
-	if(W)print"#Warnings/Info:"W
+	if(W)print"# "Version"\n#Warnings/Info:"W
 }
