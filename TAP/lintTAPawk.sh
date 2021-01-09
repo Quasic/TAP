@@ -1,53 +1,21 @@
 #!/bin/bash
+Version='1.0m'
 if [ -f "$1" ]
 then
 	L=( "$@" )
-	echo "#TAP testing awk scripts via $0"
+	printf '#TAP testing awk scripts'
 else
 	shopt -s nullglob globstar
 	L=( ./**/*.awk )
-	echo "#TAP testing $(realpath .)/*.awk via $0"
+	printf '#TAP testing %s' "$(realpath .)/*.awk"
 fi
-echo "1..${#L[@]}"
+dir=$(dirname "${BASH_SOURCE[0]}")
+printf ' via %s\n' "lintTAPawk.sh $Version; $(gawk -v help=version -f "$dir/lintparse.awk")
+1..${#L[@]}"
 r=0
 for f in "${L[@]}"
 do
-	gawk --lint -e 'BEGIN{exit 0}END{exit 0}' -f "$f" 2>&1| gawk -v file="$f" -e '
-		/ (is|are) a gawk extension$/{next}
-		/^gawk: ( *|In file included) from /{P=P"\n#"$0;next}
-		/ warning: (already included source file |POSIX does not allow `\\x'\'' escapes$)/{
-			W=W"\n#"$0
-			P=""
-			next
-		}
-		match($0,/^gawk: warning: function( .*) defined but never called directly$/,M){
-			if(M[1]!~/hook/){
-				LIB=LIB M[1]
-				next
-			}
-		}
-		match($0,/^gawk: warning: function( .*) called but never defined$/,M){
-			if(M[1]~/hook/){
-				HOOKS=HOOKS M[1]
-				next
-			}
-		}
-		{
-			X=X P"\n#"$0
-			P=""
-		}
-		END{
-			if(LIB)W=W"\n#Unused Library functions:"LIB
-			if(HOOKS)W=W"\n#Unused hooks:"HOOKS
-			if(X){
-				print"not ok - "file"\n#Errors:"X
-				if(W)print"#Warnings/Info:"W
-				exit 1
-			}
-			print"ok - "file
-			if(W)print"#Warnings/Info:"W
-		}
-	'||((r++))
+	gawk --lint -e 'BEGIN{exit 0}END{exit 0}' -f "$f" 2>&1|gawk -v file="$f" -v shebang="$(head -n1 "$f")" -f "$dir/lintparse.awk"||((r++))
 done
 if [ "$r" -gt 0 ]
 then
