@@ -1,6 +1,6 @@
 #!/bin/gawk -v help=usage -f
 BEGIN{
-	Version="lintparse.awk 1.0a; GNU Awk "PROCINFO["version"]", API: "PROCINFO["api_major"]"."PROCINFO["api_minor"]"; "PROCINFO["mpfr_version"]"; "PROCINFO["gmp_version"]
+	Version="lintparse.awk 1.0b; GNU Awk "PROCINFO["version"]", API: "PROCINFO["api_major"]"."PROCINFO["api_minor"]"; "PROCINFO["mpfr_version"]"; "PROCINFO["gmp_version"]
 	if(help)print Version
 	else if(!"file" in SYMTAB){
 		print "ERROR: file variable is required"
@@ -16,6 +16,7 @@ print"released under Creative Commons Attribution (BY) 4.0 license"
 print"Please report bugs at https://github.com/Quasic/TAP/issues"
 	}
 	if(help)exit help=="err"?1:0
+	#mawk?
 	gawk=dialect=="gawk"||file~/\.gawk$/||shebang~/^#!?(.*\/|)gawk /
 }
 / (is|are) a gawk extension$/{
@@ -50,6 +51,9 @@ match($0,/^gawk: warning: function( .*) called but never defined$/,M){
 	if(M[1]~/hook/){
 		HOOKS=HOOKS M[1]
 		next
+	}else if(!gawk){
+		REQF=REQF M[1]
+		next
 	}
 }
 {
@@ -59,6 +63,7 @@ match($0,/^gawk: warning: function( .*) called but never defined$/,M){
 END{
 	if(help)exit
 	if(LIB)W=W"\n#Unused Library functions:"LIB
+	if(REQF)W=W"\n#Requires Library functions:"REQF
 	if(HOOKS)W=W"\n#Unused hooks:"HOOKS
 	if(X){
 		print"not ok - "file" lint "(gawk?"g":"")"awk\n# "Version"\n#Errors:"X
