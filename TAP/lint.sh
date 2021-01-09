@@ -28,7 +28,7 @@ fi
 printf '; awk: %s' "(${has[awk]}) $y"
 hasCScript(){
 	local t
-	if [ ${has[CScript]+set} ]
+	if [ "${has[CScript]+set}" ]
 	then [ "${has[CScript]}" = '' ]&&return 1
 	else
 		if command -v cscript.exe>/dev/null
@@ -129,7 +129,7 @@ do
 		[ ${has["$y"]+set} ]||has["$y"]=$(command -v "$y")
 		[ "${has["$y"]}" = '' ]&&skip "$y not found" 1
 		okname "$f lint $y" "$y" -n "$f"
-		if ! [ ${has[shellcheck]+set} ]
+		if ! [ "${has[shellcheck]+set}" ]
 		then
 			if command -v shellcheck>/dev/null&&
 				y=$(shellcheck --version)
