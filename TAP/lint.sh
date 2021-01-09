@@ -1,5 +1,5 @@
 #!/bin/bash
-printf '#TAP lint.sh 1.0e'
+printf '#TAP lint.sh 1.0f'
 [ "$1" = '--version' ]&&printf '\n'&&exit
 dir=$(dirname "${BASH_SOURCE[0]}")
 declare -A has
