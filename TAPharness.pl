@@ -7,6 +7,13 @@ Version Alpha
 
 This was an experiment in an alternative simple way to handle file types, rather than using SourceHandlers, (I eventually figured out I could use my own SourceHandlers,) but I couldn't figure out a bug in the testcases. It worked for most practical testcases, though.
 
+=head1 USAGE
+
+TAPharness.pl [testlist]
+
+Example:
+TAPharness.pl TAP/lintTAP*.sh t/testcasesTAP*.*
+
 =head1 BUGS
 
 Unsolved bugs:
