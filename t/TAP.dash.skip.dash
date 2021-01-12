@@ -1,0 +1,4 @@
+#!/bin/dash
+. TAP/TAP.dash
+startTests 'TAP.dash skip testcase' 'skip test test'
+endtests

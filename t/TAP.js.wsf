@@ -1,0 +1,6 @@
+<?xml?>
+<job id="testcasesTAPjs">
+<script language="JScript" src="lib/requireCSCRIPT.js"></script>
+<script language="JScript" src="../TAP/TAP.js"></script>
+<script language="JScript" src="lib/testcasesTAP.js"></script>
+</job>
