@@ -2,7 +2,7 @@
 <script language=JScript src="lib/requireCSCRIPT.js"></script>
 <script language=JScript src="../TAP/TAP.js"></script>
 <script language=JScript>
-T=startTests(function(s){WScript.stdout.write(s)},"testcasesTAPjs0","skip test test");
+T=startTests("testcases TAP.js skip","skip test test");
 T.endTests();
 </script>
 </job>

@@ -1,3 +1,4 @@
-#!/bin/bash
-source TAP/TAP.sh 'gitscript shell testcases' 'skip test test'
+#!/bin/sh
+. TAP/TAP.sh
+startTests 'TAP.sh skip testcase' 'skip test test'
 endtests
