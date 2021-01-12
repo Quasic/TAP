@@ -4,7 +4,8 @@
 #released under Creative Commons Attribution (BY) 4.0 license
 #Please report bugs at https://github.com/Quasic/TAP/issues
 
-printf '#TAP testing %s (TAP.sh version 1.0 beta)\n' "$1"
+startTests(){
+printf '#TAP testing %s (TAP.sh 1.0c)\n' "$1"
 case "$2" in
 '?') TAP_NumTests='?';;
 *[!0-9]*|'') printf '1..0 #Skipped: %s\n' "$2";TAP_NumTests=0;;
@@ -13,6 +14,7 @@ esac
 TAP_TestsRun=0
 TAP_TestsFailed=0
 TAP_SkipTests=0
+}
 endtests(){
 	if [ "$TAP_TestsFailed" -ne 0 ]
 	then

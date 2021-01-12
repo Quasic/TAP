@@ -1,6 +1,7 @@
 #!/bin/sh
 cd "$(dirname "$0")/.."||printf 'Given path %s, stuck in %s\n' "$0" "$(pwd)"
-. TAP/TAP.sh 'gitscript shell testcases' 31
+. TAP/TAP.sh
+startTests 'gitscript shell testcases' 31
 pass 'TAP dummy pass'
 skip 'TAP dummy' 5
 	pass 'TAP dummy pass'
