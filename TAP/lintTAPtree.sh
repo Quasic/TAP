@@ -8,7 +8,7 @@ else
 	L=( ./**/* )
 fi
 #shellcheck source=TAP/TAP.sh
-source "$(dirname "${BASH_SOURCE[0]}")/TAP.sh" "$(basename "$0")" "${#L[@]}"
+source "$(dirname "${BASH_SOURCE[0]}")/TAP.bash" "$(basename "$0")" "${#L[@]}"
 for f in "${L[@]}"
 do is "$(printf "%s" "$f" | LC_ALL=C tr -d '[ -~]\0' | wc -c)" 0 "ASCII-only $f"
 done

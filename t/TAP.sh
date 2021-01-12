@@ -31,7 +31,7 @@ like 'ab c de' '^ab c de$' likepass
 unlike flags boat unlikepass
 (. TAP/TAP.sh bailout "?"&&bailout test)>/dev/null
 is $? 255 BailoutExitCode
-like "$(sh -c '. TAP/TAP.sh bailout "?"&&bailout test'|tr '~\n' '-~')" ~~Bail\ out!\ \ test~$ Bailout
+like "$(sh -c '. TAP/TAP.sh;startTests bailout "?"&&bailout test'|tr '~\n' '-~')" ~Bail\ out!\ \ test~$ Bailout
 subtest subtestinskip skiptest bailout
 subtest subtestfuncpass 1 is 5 5 subispass
 subtest subtestevalpass 3 'pass subpass;is 5 5 subispass
