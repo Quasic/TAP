@@ -1,0 +1,40 @@
+body{
+	background-color:black;
+	color:silver;
+}
+a{
+	color:blue;
+}
+.comment{
+	background-color:silver;
+	color:black;
+}
+.plan{
+	background-color:blue;
+	color:white;
+}
+.pass{
+	background-color:green;
+	color:black;
+}
+.todofail{
+	color:white;
+}
+.fail{
+	background-color:red;
+	color:black;
+}
+.todopass{
+	background-color:orange;
+}
+.skipfail{
+	color:white;
+}
+.parseErr{
+	background-color:gray;
+	color:red;
+}
+.bailout{
+	background-color:black;
+	color:red;
+}
