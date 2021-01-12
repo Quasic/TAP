@@ -49,6 +49,7 @@ else updateTAP(){
 				do [ -f "$toDir/$f" ]&&git show master:./"$f">"$toDir/$f"&&printf 'Updated %s\n' "$f"&&g[${#g[@]}]="$f"
 				done<<<"$(git ls-tree --name-only -r master)"
 				printf '%s\n' "$t">"$toDir/gitSrc.ref"
+				g[${#g[@]}]='gitSrc.ref'
 				r="$t"
 				t="$(git rev-parse master)"
 			done
