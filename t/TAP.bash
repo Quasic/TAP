@@ -1,6 +1,6 @@
 #!/bin/bash
 cd "$(dirname "${BASH_SOURCE[0]}")/.."||exit 1
-source TAP/TAP.bash 'TAP.bash testcases' 30
+source TAP/TAP.bash 'TAP.bash testcases' 31
 pass 'TAP dummy pass'
 skip 'TAP dummy' 5
 	pass 'TAP dummy pass'
@@ -36,6 +36,7 @@ isnt 5 6 subisntpass'
 subtest subtestpass 1 pass
 #internal false should be replaced by endtests
 subtest subtestfalse 1 'pass subpass;false'
+subtest subtestq '?' 'pass subpass1'
 printf '    not ok - subtest2ignore\n'
 diag <<<'redirection diag'
 diag 'testing diag
