@@ -1,55 +1,75 @@
-function startTests(write,name,num){
-function w(s){write(s+"\n");}
+/*
+TAP format testcase library for JavaScript
+by Quasic
+released under Creative Commons Attribution (BY) 4.0 license
+Please report bugs at https://github.com/Quasic/TAP/issues
+*/
+(function(){
+var st=startTests=function(name,num,opts){
+if(!opts)opts={};
+if(!opts.write){
+	if(typeof WScript!="undefined")opts.write=function(s){WScript.stdout.write(s+"\n");};
+	else if(typeof console!="undefined"&&console.log)opts.write=console.log;
+}
+opts.write("#TAP testing "+name+
+	" (TAP.js 1.0)")
+if(!opts.exit){
+	if(typeof WScript!="undefined")opts.exit=function(x){WScript.quit(x);};
+	else opts.exit=function(x){opts.write("#Exit code: "+x)};
+}
 function x(x){
-if(typeof WScript!="undefined")WScript.quit(x);
+if(opts.exit)opts.exit(x);
 return x;
 }
-w("#TAP testing "+name)
-if(isNaN(parseInt(num))){
-	w("1..0 # Skipped: "+num);
+if(num==="?"){
+}else if(isNaN(parseInt(num))){
+	opts.write("1..0 # Skipped: "+num);
 	num=0;
 }else{
-	w("1.."+(num*=1));
+	opts.write("1.."+(num*=1));
 }
-var ran=0,failed=0,skip=0,skipwhy,skiptype,O={
+var ran=0,failed=0,skip=0,skipwhy,skiptype,pass,fail,O={
 endTests:function(){
-if(num!=ran){
-	w("#Planned "+num+" tests, but ran "+ran+"tests");
+if(num==="?"){
+	opts.write("1.."+ran);
+}else if(num!=ran){
+	opts.write("#Planned "+num+" tests, but ran "+ran+" tests");
 	return 255;
 }
 return x(failed>254?254:failed);
 },
 bailOut:function(reason){
-w("Bail out!  "+reason);
-return x(255);
+opts.write("Bail out!  "+reason);
+x(255);
+throw new Error(255,"255: TAP test "+name+" Bailed out! "+reason);
 },
-pass:function(s){
+pass:pass=function(s){
 	ran++;
 	if(skip){
 		skip--;
 		if(skiptype=="TODO"){
-			w("ok "+ran+" - "+s+" # TODO "+skipwhy);
+			opts.write("ok "+ran+" - "+s+" # TODO "+skipwhy);
 		}else{
-			w("ok "+ran+" # skip "+skipwhy);
+			opts.write("ok "+ran+" # skip "+skipwhy);
 		}
 	}else{
-		w("ok - "+s);
+		opts.write("ok - "+s);
 	}
 },
-fail:function(s,n){
+fail:fail=function(s,n){
 	ran++;
 	if(skip){
 		skip--;
 		if(skiptype=="TODO"){
-			w("not ok "+ran+" - "+s+" # TODO "+skipwhy+"\n#   Failed (TODO) test '"+s+"'");
+			opts.write("not ok "+ran+" - "+s+" # TODO "+skipwhy+"\n#   Failed (TODO) test '"+s+"'");
 		}else{
-			w("ok "+ran+" # skip "+skipwhy);
+			opts.write("ok "+ran+" # skip "+skipwhy);
 		}
 	}else{
 		failed++;
-		w("not ok - "+s);
+		opts.write("not ok - "+s);
 		if(n){
-			w("#"+name+": "+n);
+			opts.write("#"+name+": "+n);
 		}
 	}
 },
@@ -70,7 +90,26 @@ todo:function(why,n){
 	skiptype="TODO";
 },
 diag:function(s){
-	w("#"+s);
+	opts.write("#"+s.replace(/\n/,"\n#"));
+},
+subtest:function(name,num,f){
+	if(skip&&skiptype=="skip")return pass(name);
+	if(isNaN(parseInt(num))){
+		opts.write("    1..0 #Skipped: "+num);
+		return pass(name+" # Skip "+num);
+	}
+	var t=st(name,num,{write:function(s){opts.write("    "+s);},exit:function(x){if(x==255)O.bailOut("subtest bailed out");}});
+	f(t);
+	return O.is(t.endTests(),0,name);
+},
+okrun:function(fn,s){
+	if(skip&&skiptype=="skip")return pass(s);
+	try{
+		return O.ok(fn(),s);
+	}catch(e){
+		fail(s);
+		O.diag(e.message);
+	}
 },
 ok:function(t,s){
 if(t){
@@ -86,6 +125,13 @@ if(a==b){
 	fail(s+", got "+a);
 }
 },
+isIdentical:function(a,b,s){
+if(a===b){
+	pass(s);
+}else{
+	fail(s+", got "+a);
+}
+},
 isnt:function(a,b,s){
 if(a==b){
 	fail(s+", got "+a);
@@ -94,10 +140,13 @@ if(a==b){
 }
 },
 like:function(got,regex,s){
-	
+	if(got.match(regex))pass(s);
+	else fail(s+", got "+got+", which didn't match "+regex);
 },
 unlike:function(got,regex,s){
-	
+	var m=got.match(regex);
+	if(m)fail(s+", got "+got+" which matched "+regex+" for ("+m.join(")(")+")");
+	else pass(s);
 },
 isDeeply:function(gotcx,excx,s){
 	
@@ -106,4 +155,4 @@ can_ok:function(obj,methods){
 	
 }};
 return O;
-}
+}})();
