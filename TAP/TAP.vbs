@@ -1,3 +1,7 @@
+' TAP format testcase library for VBScript
+' by Quasic
+' released under Creative Commons Attribution (BY) 4.0 license
+' Please report bugs at https://github.com/Quasic/TAP/issues
 set TESTSTREAM=Nothing
 TESTSRUN=0
 TESTSFAILED=0
@@ -11,8 +15,10 @@ sub startTests(stream,name,num)
 	TESTSRUN=0
 	TESTSFAILED=0
 	SKIPTESTS=0
-	testWrite "#TAP testing "&name
-	if vartype(num)=8 then
+	testWrite "#TAP testing "&name&" (TAP.vbs 0.1)"
+	if num="?" then
+		NUMTESTS="?"
+	elseif vartype(num)=8 then
 		testWrite "1..0 # Skipped: "&num
 		NUMTESTS=0
 	else
@@ -23,9 +29,16 @@ end sub
 sub testWrite(s)
 	TESTSTREAM.write s&chr(10)
 end sub
+sub doneTesting(num)
+	if NUMTESTS<>"?" and NUMTESTS<>num then testWrite "#Planned "&NUMTESTS&" tests at start, but "&num&" tests at end"
+	NUMTESTS=num
+	endTests
+end sub
 sub endTests
 	if TESTSFAILED then testWrite "#Failed "&TESTSFAILED&" tests"
-	if TESTSRUN<>NUMTESTS then
+	if NUMTESTS="?" then
+		testWrite "1.."&TESTSRUN
+	elseif TESTSRUN<>NUMTESTS then
 		testWrite "#Planned "&NUMTESTS&" tests, but ran "&TESTSRUN&" tests"
 		TESTSFAILED=TESTSFAILED+1
 	end if
