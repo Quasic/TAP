@@ -1,5 +1,5 @@
 #!/bin/bash
-Version=0.1g
+Version=0.1h
 if [ "$1" = --help ]||[ "$1" = -h ]||[ "$2" = --help ]||[ "$2" = -h ]
 then printf '%s
 sets up prove to run TAP testcases
@@ -123,24 +123,34 @@ then
 		PERL5LIB="$(realpath .)$(if [ "$PERL5LIB" != '' ];then eval "$(perl -V:path_sep)";printf '%s' "$path_sep$PERL5LIB";fi)"
 		export PERL5LIB
 	fi
-	for f
+	for p
 	do
-		if [ "${f:0:1}" = - ]
+		if [ "${p:0:1}" = - ]
 		then
-			if [ "$f" = --norc ]
+			if [ "$p" = --norc ]
 			then useRC=0
-			elif [ "${f:0:8}" = --state= ]&&[ "$f" != --state=save ]
-			then t[${#t[@]}]="$f"
-			else o[${#o[@]}]="$f"
+			elif [ "${p:0:8}" = --state= ]&&
+				[ "$p" != --state=save ]
+			then t[${#t[@]}]="$p"
+			else o[${#o[@]}]="$p"
 			fi
-		elif [ "${f:0:7}" = lintTAP ]&&[ -f "TAP/$f" ]
+		else
+			f=$(basename "$p")
+			if [ "${f:0:7}" = lintTAP ]&&
+				[ -f "TAP/$f" ]
 		then t[${#t[@]}]="TAP/$f"
 		else
 			n=${#t[@]}
 			for q in t/"$f".* "t/$f" "t/testcases$f"
 			do [ -f "$q" ]&&t[${#t[@]}]="$q"
 			done
-			[ "$n" = ${#t[@]} ]&&printf 'No test was found for %s\n' "$f"
+				if [ "$n" != ${#t[@]} ]
+				then true
+				elif [ -f "$p" ]
+				then t[${#t[@]}]="$p"
+				else printf 'No test was found for %s\n' "$f"
+				fi
+			fi
 		fi
 	done
 	for q in t/testcases.*
