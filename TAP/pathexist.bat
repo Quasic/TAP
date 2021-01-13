@@ -1,12 +1,12 @@
 @echo off
-rem isnt.bat: log TAP contrast
+rem pathexist.bat: log TAP path check
 rem by Quasic
 rem Report bugs to https://github.com/Quasic/TAP/issues
 rem Released under Creative Commons Attribution (BY) 4.0 license
-set TAPisntVer=isnt.bat 0.3;
-if '%1'=='%2' goto f
-call "%~dp0/pass" %3
+set TAPpathexistVer=pathexist.bat 0.1;
+if exist "%1" goto yup
+call "%~dp0/fail" %2
 goto EOF
-:f
-call "%~dp0/fail" "%~3, got %1"
+:yup
+call "%~dp0/pass" %2
 :EOF
