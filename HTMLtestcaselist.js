@@ -10,7 +10,7 @@ useTAPlib:function(w){
 	t.pass("useTAPlib pass");
 	return t.endTests();
 },
-failsIntended:"1..1\nok\nnot ok\nnot ok - test # Skipped\nnot ok - blah\nok - #TODO reason",
+failsIntended:"1..1\nok\nnot ok\nok - hey # Skipped\nnot ok - test # Skipped\nnot ok - blah\nnot ok - #TODO blah\nok - #TODO reason",
 bailoutIntended:"1..1\nBail out!  reason",
 mismatchedPlansIntended:"1..1\nok\n1..4"
 };return o;}

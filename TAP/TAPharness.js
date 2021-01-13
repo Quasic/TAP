@@ -7,7 +7,7 @@ Please report bugs at https://github.com/Quasic/TAP/issues
 */
 function setuptests(container,lister){
 	document.getElementById("versions").innerHTML=
-		'; TAPharness.js 0.1';
+		'; TAPharness.js 0.1a';
 	var bailed=/^[ \t]*Bail out!  /,plan=/^1..([0-9]+)/,tests=/^(not |)ok( [1-9][0-9]*|)( |$)/,directive=/ # *([Tt][Oo][Dd][Oo]|[Ss][Kk][Ii][Pp])/;
 	function run(fn,m,o){
 		var r,d,n=0,fails=0,actual={ok:0,not:0},todopassed=0,skips=0,todos=0,planNum="?",parseErrs="",
@@ -49,7 +49,7 @@ function setuptests(container,lister){
 							if(t[1]){
 								fails++;
 								l.className+=" fail skipfail";
-							}
+							}else l.className+=" pass skip";
 						}else if(t[1]){
 							fails++;
 							l.className+=" fail";

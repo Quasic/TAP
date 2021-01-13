@@ -1,40 +1,43 @@
 body{
-	background-color:black;
-	color:silver;
+	background-color:gray;
+	color:black;
 }
 a{
 	color:blue;
 }
+#container{
+	background-color:black;
+	color:silver;
+}
 .comment{
-	background-color:silver;
-	color:black;
+	background-color:#333333;
+	color:silver;
 }
 .plan{
-	background-color:blue;
-	color:white;
+	color:blue;
 }
 .pass{
-	background-color:green;
-	color:black;
+	color:green;
+}
+.skip{
+	color:cyan;
 }
 .todofail{
-	color:white;
+	background-color:cyan;
 }
 .fail{
-	background-color:red;
-	color:black;
+	color:red;
 }
 .todopass{
-	background-color:orange;
+	background-color:cyan;
 }
 .skipfail{
-	color:white;
+	background-color:yellow;
 }
 .parseErr{
 	background-color:gray;
-	color:red;
 }
 .bailout{
-	background-color:black;
-	color:red;
+	background-color:red;
+	color:black;
 }
