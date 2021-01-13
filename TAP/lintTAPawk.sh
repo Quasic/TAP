@@ -1,5 +1,9 @@
 #!/bin/bash
 Version='1.0m'
+# runs checks on awk files
+# By Quasic
+# Report bugs to https://github.com/Quasic/TAP/issues
+# Released under Creative Commons Attribution (BY) 4.0 license
 if [ -f "$1" ]
 then
 	L=( "$@" )
