@@ -1,24 +1,29 @@
 #!/bin/bash
+Version=0.1
+# finds and runs perl files through checks
+# By Quasic
+# Report bugs to https://github.com/Quasic/TAP/issues
+# Released under Creative Commons Attribution (BY) 4.0 license
 if [ -f "$1" ]
 then
 	L=( "$@" )
-	echo "#TAP testing perl scripts via $0"
+	printf '#TAP testing perl scripts via lintTAPperl.sh %s\n' "$Version"
 else
 	shopt -s nullglob globstar
 	L=( ./**/*.pl ./**/*.plx ./**/*.pm )
-	echo "#TAP testing $(realpath .)/*.pl via $0"
+	printf '#TAP testing %s\n' "$(realpath .)/*.pl via lintTAPperl.sh $Version"
 fi
-echo "1..${#L[@]}"
+printf '1..%i\n' "${#L[@]}"
 r=0
 for f in "${L[@]}"
 do
 	if q=$(perl -wct "$f" 2>&1)
-	then echo "ok - $f"
+	then printf 'ok - %s\n' "$f"
 	else
-		echo "not ok - $f"
+		printf 'not ok - %s\n' "$f"
 		while read -r t
 		do
-			echo "#$t"
+			printf '#%s\n' "$t"
 		done<<<"$q"
 		((r++))
 	fi
