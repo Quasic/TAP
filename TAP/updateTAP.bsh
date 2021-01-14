@@ -1,38 +1,38 @@
 #!/bin/bash
 if [ $# != 0 ]
-then printf 'selective TAP library updater version 0.4
-Usage: cd targetTAPdir; [bash|source] fromDir/updateTAP.bsh
-If targetTAPdir is in a git repo, the updated files are staged,
-and if there were no staged changes before running this script,
-the update is committed.
+then printf 'selective TAP library updater version 0.5
+Usage: cd targetDir; [bash|source] fromDir/updateTAP.bsh
+targetDir should be the parent dir that contains the TAP folder.
+If targetDir is in a git repo, the updated files are staged and committed.
+(Any other changes are stashed during this process.)
+
 updateTAP.bsh should not usually be copied locally,
 but should run from the main TAP repo
 (exceptions are possible,
 such as in update chains not using the git TAP repo)
 
-This could be modified to work with other libraries by changing the 
-
 By Quasic [quasic.github.io]
 Report bugs to https://github.com/Quasic/TAP/issues
 Released under Creative Commons Attribution (BY) 4.0 license
 '
+elif ! [ -d TAP ]
+then printf 'This file must be run from the parent directory of the destination TAP folder'
 else updateTAP(){
 	#avoid messing up global in case sourced
+	local toP
+	toP=$(pwd)||exit 1
 	local toDir
-	toDir=$(pwd)||exit 1
+	toDir="$toP/TAP"
 	local fromDir
 	fromDir=$(dirname "${BASH_SOURCE[0]}")||exit 1
 	local t
 	local f
 	local hasgit
-	local updgit
+	local stashed
 	if t=$(git status --porcelain)2>/dev/null
 	then
 		hasgit=1
-		if gawk '{if($1!="??"&&$2!~/^TAP\//){print "Git: Will update and stage, but not automatically commit, due to status: "$0;exit 1}}' <<<"$t"
-		then updgit=1
-		else git status
-		fi
+		git stash&&stashed=1
 	else printf 'Not in a git repository.'
 	fi
 	if cd "$fromDir"&&t=$(git rev-parse master) 2>/dev/null
@@ -44,17 +44,17 @@ else updateTAP(){
 		then
 			while [ "$t" != "$r" ]
 			do
+				g=()
 				printf 'Updating from revision %s to %s\n' "$r" "$t"
 				while read -r f
-				do [ -f "$toDir/$f" ]&&git show master:./"$f">"$toDir/$f"&&printf 'Updated %s\n' "$f"&&g[${#g[@]}]="$f"
+				do [ -f "$toDir/$f" ]&&git --work-tree="$toP" checkout "$t" -- TAP/"$f"&&g[${#g[@]}]=TAP/"$f"
 				done<<<"$(git ls-tree --name-only -r master)"
-				printf '%s\n' "$t">"$toDir/gitSrc.ref"
-				g[${#g[@]}]='gitSrc.ref'
 				r="$t"
 				t="$(git rev-parse master)"
 			done
-			[ "$hasgit" = 1 ]&&if cd "$toDir"
-			then git add "${g[@]}"
+			printf '%s\n' "$r">"$toDir/gitSrc.ref"
+			[ "$hasgit" = 1 ]&&if cd "$toP"
+			then git add "${g[@]}" TAP/gitSrc.ref&&git commit -m "Auto-update TAP library"
 			else
 				printf 'Failed to change back to target directory, did not add files or commit.'
 				exit 1
@@ -74,11 +74,11 @@ else updateTAP(){
 		done
 		if [ "$hasgit" = 1 ]
 		then git rm gitSrc.ref 2>/dev/null
+			git commit -m "Auto-update TAP library"
 		else rm gitSrc.ref 2>/dev/null
 		fi
 	fi
-	cd "$toDir"||exit 1
-	[ "$updgit" != '' ]&&
-		git commit -m "Update TAP library"
+	cd "$toP"||exit 1
+	[ "$stashed" = 1 ]&&git stash pop
 };updateTAP
 fi
