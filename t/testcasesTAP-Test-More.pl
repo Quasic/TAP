@@ -1,5 +1,4 @@
 #!perl
-use strict;
 use warnings;
 if(!eval{
 require Test::More;
