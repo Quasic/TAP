@@ -28,6 +28,8 @@ Released under Creative Commons Attribution (BY) 4.0 license
 
 =cut
 
+use strict;
+use warnings;
 use TAP::Harness;
 exit 1 if ((TAP::Harness->new({
   color=>1,
