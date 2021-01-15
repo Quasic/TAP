@@ -47,7 +47,5 @@ jobs:
       # Runs a single command using the runners shell
       - name: prove on Windows
         run: |
-          set PERL5LIB=%~dp0
-          pwd
-          echo %~dp0
+          set PERL5LIB=D:\a\TAP\TAP
           prove t\startTests.bat --source=WSH t\*.wsf t\*.vbs t\*.js t\endTests.bat
