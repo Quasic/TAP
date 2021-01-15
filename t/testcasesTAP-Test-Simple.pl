@@ -1,4 +1,6 @@
 #!perl
+use strict;
+use warnings;
 if(!eval{
 require Test::Simple;
 Test::Simple->import(tests=>1);

@@ -34,5 +34,5 @@ then
 	if [ "$r" -gt 254 ]
 	then exit 254
 	fi
-	exit $r
+	exit "$r"
 fi

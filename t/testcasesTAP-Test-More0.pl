@@ -1,4 +1,6 @@
 #!perl
+use strict;
+use warnings;
 if(!eval{
 require Test::More;
 Test::More->import(skip_all=>'skip test test');
