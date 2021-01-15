@@ -29,7 +29,7 @@ okrun '[ 5 -lt 9 ]' okrunmathpass
 okname oknamepass [ 5 -lt 9 ]
 like 'ab c de' '^ab c de$' likepass
 unlike flags boat unlikepass
-(. TAP/TAP.sh bailout "?"&&bailout test)>/dev/null
+(. TAP/TAP.sh&&startTests bailout "?"&&bailout test)>/dev/null
 is $? 255 BailoutExitCode
 like "$(sh -c '. TAP/TAP.sh;startTests bailout "?"&&bailout test'|tr '~\n' '-~')" ~Bail\ out!\ \ test~$ Bailout
 subtest subtestinskip skiptest bailout

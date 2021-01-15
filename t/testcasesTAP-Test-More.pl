@@ -1,4 +1,5 @@
 #!perl
+use warnings;
 if(!eval{
 require Test::More;
 Test::More->import(tests=>4);
