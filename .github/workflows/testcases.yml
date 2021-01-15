@@ -47,5 +47,6 @@ jobs:
       # Runs a single command using the runners shell
       - name: prove on Windows
         run: |
-          set PERL5LIB=/github/workspace
+          #set PERL5LIB=
+          pwd
           prove t\startTests.bat --source=WSH t\*.wsf t\*.vbs t\*.js t\endTests.bat
