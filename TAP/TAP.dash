@@ -5,7 +5,7 @@
 #Please report bugs at https://github.com/Quasic/TAP/issues
 
 startTests(){
-printf '#TAP testing %s (TAP.dash 1.0a)\n' "$1"
+printf '#TAP testing %s (TAP.dash 1.0b)\n' "$1"
 case "$2" in
 '?') TAP_NumTests='?';;
 *[!0-9]*|'') printf '1..0 #Skipped: %s\n' "$2";TAP_NumTests=0;;
@@ -30,6 +30,7 @@ endtests(){
 	fi
 	exit $TAP_TestsFailed
 }
+alias endTests=endtests
 bailout(){
 	printf '\nBail out!  %s\n' "$1"
 	exit 255
